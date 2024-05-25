@@ -1,0 +1,726 @@
+/* Global setting */
+/* 全局设定 */
+body {
+	font-size: 1em;
+	text-align: justify;
+	line-height: 1.5;
+}
+
+/* TOC link color */
+/* 目录条目链接颜色 */
+a {
+	color: #0000CC;
+}
+
+/* TOC Title */
+/* 目录标题 */
+.sgc-toc-title {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 1em;
+	letter-spacing: 1em;
+    text-align: center;
+	border-bottom: 1.5px dotted #000000;
+}
+
+/* Level 1 TOC */
+/* 一级标题 */
+.sgc-toc-level-1 {
+    margin-left: 0em;
+}
+
+/* Level 2 TOC */
+/* 二级标题 */
+.sgc-toc-level-2 {
+    margin-left: 2em;
+}
+
+/* Level 3 TOC */
+/* 三级标题 */
+.sgc-toc-level-3 {
+    margin-left: 4em;
+}
+
+/* Level 4 TOC */
+/* 四级标题 */
+.sgc-toc-level-4 {
+    margin-left: 4em;
+}
+
+/* Level 5 TOC */
+/* 五级标题 */
+.sgc-toc-level-5 {
+    margin-left: 4em;
+}
+
+/* Level 6 TOC */
+/* 六级标题 */
+.sgc-toc-level-6 {
+    margin-left: 4em;
+}
+
+
+div.tupian {
+	width: 100%;
+	margin: 1em auto 1em auto;
+	text-align: center;
+}
+
+div.tupian-8 {
+	width: 80%;
+	margin: 1em auto 1em auto;
+	text-align: center;
+}
+
+div.tupian-sz {
+	width: 50%;
+	margin: 1em auto 1em auto;
+	text-align: center;
+}
+
+div.tupian-sz75 {
+	width: 75%;
+	margin: 1em auto 1em auto;
+	text-align: center;
+}
+
+div.tupian-sz65 {
+	width: 65%;
+	margin: 1em auto 1em auto;
+	text-align: center;
+}
+div.tupian-sz2 {
+	width: 35%;
+	margin: 1em auto 1em auto;
+	text-align: center;
+}
+
+div.tupian-sz3 {
+	width: 25%;
+	margin: 1em auto 1em auto;
+	text-align: center;
+}
+
+div.tupian-s {
+	width: 50%;
+	margin: 1em auto 1em auto;
+	text-align: center;
+}
+
+div.tupian1 {
+	width: 100%;
+	margin: 1em auto 1em auto;
+	text-align: center;
+}
+
+/* 插图左浮动 */
+div.tupian-float-left
+{
+	float:left;
+  margin:0.6em 1.17em 0.6em 0em;
+  width:45%;
+}
+
+/* 插图右浮动 */
+div.tupian-float-right
+{
+	float:right;
+  margin:0.6em 0em 0.6em 1.17em;
+  width:45%;
+}
+
+p.banquanxinxi {
+	font-weight: bold;
+}
+p.bodycontent-text-p-c {
+	text-indent: 0em;
+	text-align: center;
+	font-family: "MYing Hei S", Hei; 
+}
+
+p.bodycontent-text-p {
+	text-indent: 2em;
+	font-family: "MYing Hei S", Hei; 
+}
+
+p.bodycontent-text {
+	text-indent: 2em;
+	font-family: STSong, "Song S", Song; 
+}
+p.bodycontent-text1 {
+	text-indent: 0em;
+	font-family: STSong, "Song S", Song; 
+}
+
+p.bodycontent-text-dg {
+	text-indent: 0em;
+	font-family: STSong, "Song S", Song; 
+}
+
+p.bodycontent-text-2 {
+	text-indent: 5.5em;
+	font-family: STSong, "Song S", Song; 
+}
+
+p.bodycontent-textno {
+	text-indent: 0em;
+	font-family: STSong, "Song S", Song; 
+}
+p.bodycontent-textc1 {
+	text-align: center;
+	font-size: 0.8em;
+	font-family: STSong, "Song S", Song; 
+}
+
+
+p.bodycontent-textc {
+	text-align: center;
+	font-family: STSong, "Song S", Song; 
+	font-size: 1.5em;
+}
+
+
+p.bodycontent-text_right {
+	font-family: STKai, "MKai PRC", Kai; 
+	text-align: right;
+}
+
+p.bodycontent-text-tushuo {
+	font-family: "MYing Hei S", Hei; 
+	text-align: center;
+	font-size: 0.8em;
+	page-break-before: avoid;
+	page-break-after: avoid;
+	margin-top: -0.1em;
+}
+
+p.bodycontent-text-tushuo1 {
+	font-family: "MYing Hei S", Hei; 
+	text-align: center;
+	font-size: 0.8em;
+	page-break-before: avoid;
+	page-break-after: avoid;
+	margin-top: -1em;
+}
+
+h1.bodycontent-first-title-p {
+	font-family: "MYing Hei S", Hei; 
+	font-size: 1.3em;
+	margin-bottom: 1.5em;
+	margin-top: 0.5em;
+	text-align: center;
+}
+
+h1.bodycontent-first-title {
+	font-family: "MYing Hei S", Hei; 
+	font-size: 1.6em;
+	margin-bottom: 2.5em;
+	margin-top: 0.5em;
+	text-align: center;
+}
+
+h2.bodycontent-second-title {
+	font-family: "MYing Hei S", Hei; 
+	page-break-after: avoid;
+	font-size: 1.4em;
+	margin-bottom: 0.8em;
+	margin-top: 2.5em;
+	text-align: left;
+	text-indent: 0em;
+}
+
+h2.bodycontent-second-title1 {
+	font-family: "MYing Hei S", Hei; 
+	page-break-after: avoid;
+	font-size: 1.4em;
+	margin-bottom: 0.8em;
+	text-align: left;
+	text-indent: 0em;
+}
+
+h3.bodycontent-third-title {
+	font-family: "MYing Hei S", Hei; 
+	font-size: 1.2em;
+	margin-bottom: 0.7em;
+	margin-top: 1em;
+}
+
+p.bodycontent-text-bold {
+	text-indent: 0em;
+	font-family: "MYing Hei S", Hei; 
+	font-size: 1.1em;
+	margin-bottom: 0.7em;
+	margin-top: 1.5em;
+	font-weight: bold;
+}
+
+/* 版权信息页标题 */
+/* Copyright page title */
+h1.kindle-cn-copyright-title {
+	page-break-before: avoid;
+	font-family: STSong, "Song S", Song; 
+
+	font-size: 1.1em;
+	margin: 0.2em auto; 
+	text-align: left; 
+	text-indent: 0em;
+}
+
+/* 版权信息页正文 */
+/* Copyright page text */
+p.kindle-cn-copyright-text {
+	font-family: STSong, "Song S", Song; 
+
+	line-height: 1.2;
+	text-indent: 0em;
+}
+
+p.kindle-cn-copyright-text-center {
+	font-family: STSong, "Song S", Song; 
+
+	line-height: 1.2;
+	text-indent: 0em;
+	margin-left: 35%;
+}
+
+p.kindle-cn-copyright-text-center1 {
+	font-family: STSong, "Song S", Song; 
+
+	line-height: 1.2;
+	text-indent: -5em;
+	margin-left: 35%;
+}
+
+p.bodycontent-text-bw {
+	font-family: "MYing Hei S", Hei; 
+	line-height: 1.2;
+	text-indent: 0em;
+	margin-left: 2em;
+}
+p.bodycontent-text-bw-4 {
+	font-family: "MYing Hei S", Hei; 
+	line-height: 1.2;
+	text-indent: 0em;
+	margin-left: 10%;
+}
+
+p.bodycontent-text-bw-center {
+	font-family: "MYing Hei S", Hei; 
+	line-height: 1.2;
+	text-indent: 0em;
+	text-align: center;
+}
+
+/* Quote */
+/* 引用框 */
+blockquote.kindle-cn-blockquote {
+  background: #f9f9f9;
+  border-left: 0.5em solid #ccc;
+  margin: 1.5em;
+  padding: 0.5em;
+  text-indent:2em;
+}
+
+/* 注释 */
+p.zhusi {
+	line-height: 1.5;
+	font-family: "MYing Hei S", Hei; 
+	text-indent: 0em;
+	font-size: 0.8em;
+}
+
+p.bodycontent-text_center {
+	font-family: "MYing Hei S", Hei; 
+	text-align: center;
+	font-weight: bold;
+}
+
+p.bodycontent-text_yinwen {
+	font-family: "MYing Hei S", Hei; 
+	line-height: 1.5;
+	text-indent: 2em;
+	font-size: 0.8em;
+}
+
+p.bodycontent-text_yinwen1 {
+	font-family: STKai, "MKai PRC", Kai; 
+	line-height: 1.5;
+	text-indent: 2em;
+	font-size: 1em;
+}
+
+p.bodycontent-text_noindent {
+	font-family: STKai, "MKai PRC", Kai; 
+	line-height: 1.5;
+	text-indent: 2em;
+	font-size: 1em;
+}
+
+img.image-alone13 {
+	width: 40%;
+	margin-bottom: 0.2em;
+}
+
+
+img.image-alone12 {
+	width: 20%;
+	margin-bottom: 0.2em;
+}
+
+img.image-alone {
+	margin-bottom: 0.2em;
+	width: 100%;
+
+}
+
+img.image-alone1{
+	width: 100%;
+}
+
+/* 数学上标字体 */  
+span.math-super {  
+    font-size: 0.7em;  
+    vertical-align: super;  
+}  
+/* 数学上标倾斜字体 */  
+span.math-super-italic {  
+    font-size: 0.7em;  
+    font-style: italic;  
+    vertical-align: super;  
+}   
+/* 数学下标字体 */  
+span.math-sub {  
+    font-size: 0.7em;  
+    vertical-align: sub;  
+}  
+
+
+/* 全屏图样式 */
+.athena_imgwrap_fullscreen
+{
+  display:block;
+  margin:0em;
+  padding:0em;
+  width: 100%;
+}
+
+
+p.bodycontent-text_yinwen-title {
+	font-family: "MYing Hei S", Hei; 
+	font-size: 1.1em;
+	margin-bottom: 0.5em;
+	margin-top: 2.5em;
+}
+
+h1.titletop {
+	font-family: "MYing Hei S", Hei; 
+	font-size: 2em;
+	font-weight: bold;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	text-align: center;
+}
+
+span.small {
+	font-size: 0.8em;
+	font-family: "MYing Hei S", Hei; 
+}
+
+h1.title1 {
+	font-family: "MYing Hei S", Hei; 
+	font-size: 1.5em;
+	font-weight: bold;
+	margin-top: 1em;
+	margin-bottom: 1em;
+	text-align: center;
+}
+
+
+.normaltext4 {
+	text-indent: 0em;
+	margin-top: 0.2em;
+	margin-bottom: 0pt;
+	text-align: center; 
+}
+
+.normaltext {
+	text-indent: 2em;
+	margin-top: 0pt;
+	margin-bottom: 0pt;
+}
+
+div.logo {
+	margin: 40% auto auto;
+	text-align: center;
+	width: 80%;
+}
+
+div.logo-1 {
+	margin: auto auto auto 35%;
+	text-align: left;
+}
+
+img.logo-1 {
+	height: 4em;
+}
+
+img.logo {
+	width: 40%;
+}
+
+span.gjz {
+	font-family: "MYing Hei S", Hei; 
+	font-weight: bold;
+	font-size: 1em;
+	font-style:normal;
+}
+p.bodycontent-text-gjz {
+	font-family: "MYing Hei S", Hei; 
+	line-height: 1.5;
+	text-indent: 0em;
+	font-style: italic;
+	font-size: 0.9em;
+}
+
+p.bodycontent-text-gjz-z {
+	font-family: "MYing Hei S", Hei; 
+	line-height: 1.5;
+	text-indent: 0em;
+	font-size: 0.9em;
+}
+
+p.bodycontent-text-wbs3 {
+	font-family: "MYing Hei S", Hei; 
+	line-height: 1;
+	text-indent: 0em;
+	font-size: 0.9em;
+	font-weight: normal;
+	margin-top: 0em;
+	margin-bottom:0.5em;
+}
+p.bodycontent-text-webs2 {
+	font-family: "MYing Hei S", Hei; 
+	line-height: 1;
+	text-indent: 0em;
+	page-break-after: avoid;
+	font-size: 1em;
+	font-weight: bold;
+	margin-top: 0em;
+}
+
+p.bodycontent-text-wbs {
+	font-family: "MYing Hei S", Hei; 
+	page-break-after: avoid;
+	line-height: 1;
+	text-indent: 0em;
+	font-size: 0.8em;
+	font-weight: bold;
+	margin-top: 1.5em;
+}
+
+/* 造字 */
+img.paralog {
+	height: 3em;
+	vertical-align: -1em;
+}
+
+/* 造字 */
+img.paralog15-05 {
+	height: 2.3em;
+	vertical-align: -1.8em;
+}
+
+
+/* 造字 */
+img.paralog12 {
+	height: 1.6em;
+	vertical-align: -0.12em;
+}
+
+/* 造字 */
+img.paralog-s {
+	height: 1.4em;
+	vertical-align: -0.34em;
+}
+
+/* 造字 */
+img.paralog-zx {
+	height: 1em;
+	vertical-align: -0.25em;
+}
+
+/* 造字 */
+img.paralog-gh2 {
+	height: 1.22em;
+	vertical-align: -0.25em;
+}
+
+/* 造字 */
+img.paralog-15 {
+	height: 1.5em;
+	vertical-align: -0.25em;
+}
+
+/* 造字 */
+img.paralog15 {
+	height: 1.8em;
+	vertical-align: -0.25em;
+}
+
+/* 造字 */
+img.paralog15-1 {
+	height: 1.7em;
+	vertical-align: -0.5em;
+}
+
+/* 造字 */
+img.paralog-6 {
+	height: 1.6em;
+	vertical-align: -0.7em;
+}
+
+/* 造字 */
+img.paralog1 {
+	height: 2.5em;
+	vertical-align: -0.9em;
+}
+
+/* 造字 */
+img.paralog98 {
+	height: 2.5em;
+	vertical-align: -0.8em;
+}
+/* 造字 */
+img.paralog1-2 {
+	height: 2em;
+	vertical-align: -0.9em;
+}
+
+/* 造字 */
+img.paralog-t2 {
+	height: 2.2em;
+	vertical-align: -0.8em;
+}
+
+/* 造字 */
+img.paralog-t {
+	height: 2em;
+	vertical-align: -0.5em;
+}
+
+
+/* 造字 */
+img.paralog-2 {
+	height: 2.3em;
+	vertical-align: -0.9em;
+	margin-bottom:0.1em;
+	margin-top:0.1em;
+}
+
+/* 造字 */
+img.paralog2 {
+	height: 3.3em;
+	vertical-align: -1.1em;
+}
+
+/* 造字 */
+img.paralog3 {
+	height: 4em;
+	vertical-align: -1.5em;
+}
+
+div.tupian-6em-l1 {
+	width: 45%;
+	margin: 0em 0.2em 0.2em 0em;
+	float: left;
+}
+
+div.tupian-6em-l {
+	width: 35%;
+	margin: 0em 0.2em 0.2em 0em;
+	float: left;
+}
+
+div.tupian-6em-r1 {
+	width: 45%;
+	margin: 0em 0em 0.2em 0.2em;
+	float: right;
+}
+div.tupian-6em-r {
+	width: 35%;
+	margin: 0.4em 0em 0.2em 0.2em;
+	float: right;
+}
+
+
+div.tupian-xxs-r-x {
+	width: 25%;
+	margin: 0.4em 0.4em 0.2em 0.2em;
+	float: right;
+}
+
+div.tupian-xxs-r {
+	width: 35%;
+	margin: 0.4em 0.4em 0.2em 0.2em;
+	float: right;
+}
+div.tupian-xxs-r1 {
+	width: 45%;
+	margin: 0.2em 0em 0.2em 0.2em;
+	float: right;
+}
+
+
+div.tupian-xxh-r {
+	width: 35%;
+	margin: 0.4em 0em 0.2em 0.2em;
+	float: right;
+}
+
+div.tupian-xxs-l-x {
+	width: 25%;
+	margin: 0.4em 0.2em 0.2em 0em;
+	float: left;
+}
+
+
+div.tupian-xxh-l {
+	width: 35%;
+	margin: 0.4em 0.2em 0.2em 0em;
+	float: left;
+}
+div.tupian-xxs-l {
+	width: 35%;
+	margin: 0.4em 0.2em 0.2em 0em;
+	float:left;
+}
+div.tupian-xxs-l1{
+	width: 45%;
+	margin: 0.2em 0.2em 0.2em 0em;
+	float:left;
+}
+img.z1 {
+	height: 1em;
+	vertical-align: -0.22em;
+}
+
+
+blockquote.kindle-cn-blockquote1 {
+  background: #f9f9f9;
+  border: 0.2em solid #ccc;
+  margin: 1.5em 0em 1em 0em;
+  border-top-left-radius: 1em;
+  padding: 0.5em;
+  text-indent:0em;
+}
+
+
+span.s1 {
+	letter-spacing:0.5em;
+	display:inline-block;
+}
+
+
+span.s2 {
+	display:inline-block;
+}
