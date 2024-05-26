@@ -2,6 +2,7 @@
 import time
 import os
 import asyncio
+import myKeys
 from langchain_core.prompts import ChatPromptTemplate
 from erniebot_agent.extensions.langchain.chat_models import ErnieBotChat
 from langchain_core.output_parsers import StrOutputParser
@@ -21,16 +22,16 @@ from erniebot_agent.file import GlobalFileManagerHandler
 class LLM:
     def __init__(self):
         os.environ["EB_AGENT_LOGGING_LEVEL"] = "INFO"
-        os.environ["EB_AGENT_ACCESS_TOKEN"] = "c65601e18d2fa9f4e8c39d9d7947303eade35507"
+        os.environ["EB_AGENT_ACCESS_TOKEN"] =  myKeys.EB_AGENT_ACCESS_TOKEN
         memory = SlidingWindowMemory(max_round=5)
         llm_final = ERNIEBot(model="ernie-3.5", api_type="aistudio", enable_multi_step_tool_call=True)
-        guider_prompt = "你是智富问答大冒险中的游戏助手，叫做小桨，你负责陪伴玩家在太空进行探险，解答玩家遇到的问题。\n"
+        guider_prompt = "你是智途问答大冒险中的游戏助手，叫做小桨，你负责陪伴玩家在太空进行探险，用比较通俗易懂的方式解答玩家遇到的问题。\n"
         self.guider_agent_all = FunctionAgent(llm=llm_final, tools=[], memory=memory, system=guider_prompt)
 
         ## 问答prompt
         self.npc_prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "你是智富问答大冒险中的NPC，你需要根据以下的背景，目的，科普知识，与玩家进行对话，达成目的。\n" \
+                ("system", "你是智途问答大冒险中的NPC，你需要根据以下的背景，目的，科普知识，与玩家进行对话，达成目的。\n" \
                             "背景：{background}\n" \
                             "目的：{purpose}\n" \
                             "科普知识：{knowledge}\n"),

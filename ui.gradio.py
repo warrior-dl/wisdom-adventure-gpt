@@ -47,7 +47,7 @@ def display_status() -> str:
     """Return a markdown string displaying the player's status."""
     status = controller.get_status()
     return (
-        "## 智富问答大冒险 <br /> \n"
+        "## 智途问答大冒险 <br /> \n"
         "### 你是一名勇敢的星际探险家，与智能AI助手小桨一同驾驶着先进的宇宙飞船，穿梭于广袤无垠的宇宙中，展开一段充满未知与挑战的探险旅程。 <br /> \n"
         "## 游戏资源 <br /> \n"
         f"### **星际货币**: {status.stellarCurrency}  "

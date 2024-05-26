@@ -2,6 +2,7 @@ import os
 import json
 import asyncio
 import erniebot
+import myKeys
 
 from erniebot_agent.agents import FunctionAgent
 from erniebot_agent.chat_models import ERNIEBot
@@ -15,39 +16,10 @@ def load_dataset(path):
     
 
 async def main():
-    os.environ["EB_AGENT_ACCESS_TOKEN"] = "c65601e18d2fa9f4e8c39d9d7947303eade35507"
-    event_setting = """
-{  
-  "eventName": "遭遇事件名称",  
-  "eventContent": "这里是关于遭遇事件的详细描述。",  
-  "eventType": "characterInteraction|choice|resourceDecision", // characterInteraction:人物交流 choice:选择 resourceDecision:资源判定
-  "eventCharacters": {  
-    "background": "事件NPC人物的背景信息。",  
-    "purpose": "事件NPC人物的目的或动机。"  
-  },  // 如果不必要则不需要添加
-  "eventOptions": [  
-    {  
-      "optionId": 1, // 可以是序号、标识符或其他唯一值  
-      "optionContent": "选项的具体描述或提示。",  
-      "result": "选择此选项后的结果描述。", 
-      "award": {
-        "key": "stellarCurrency|shipEnergy|explorationCapability|reputationValue",
-        "value": 5 // 惩罚则为负数
-      },
-      "precondition": {  
-        "operator": "<|>",  
-        "threshold": 20,  
-        "key": "stellarCurrency|shipEnergy|explorationCapability|reputationValue"  
-      }    //需要满足的条件才能选择此选项
-    },  
-    {  
-      "optionId": 2,  
-      "optionContent": "另一个选项的具体描述或提示。",  
-      "result": "选择此选项后的结果描述。"  
-      // ...  
-    }
-  ]  // eventType不是choice时只有一个选项
-}"""
+    os.environ["EB_AGENT_ACCESS_TOKEN"] = myKeys.EB_AGENT_ACCESS_TOKEN
+    ## 加载event_setting文件作为string
+    with open('event_setting.json', 'r', encoding='utf-8') as f:
+        event_setting = f.read()
     system_message = SystemMessage(content="你是一个星际大冒险知识科普游戏的事件设计师，你需要根据以下的科普问答知识来制作一个游戏事件。"
                                    "事件需要以科普知识为主要目的，作为激发儿童好奇心的引子。"
                                    "有三种事件类型：人物交流characterInteraction, 选择choice和资源判定事件resourceDecision。"
