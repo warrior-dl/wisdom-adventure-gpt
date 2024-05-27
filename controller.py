@@ -14,18 +14,18 @@ class Controller:
     def get_event(self):
         return self.current_event
     def update_event(self):
-        while True:
+        # while True:
             index, event = self.event_manager.get_event_random()
-            if index not in self.history:
-                self.current_event = event
-                self.update_status_finish = False
-                self.history.append(index)
-                break
-            elif len(self.history) == len(self.event_manager.event_list):
-                logger.info("No more event")
-                # TODO: 结算
-                self.current_event = None
-                break
+            # if index not in self.history:
+            self.current_event = event
+            self.update_status_finish = False
+            self.history.append(index)
+            #     break
+            # elif len(self.history) == len(self.event_manager.event_list):
+            #     logger.info("No more event")
+            #     # TODO: 结算
+            #     self.current_event = None
+            #     break
         
     def get_status(self):
         return self.player_status
