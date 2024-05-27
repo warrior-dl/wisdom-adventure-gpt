@@ -27,7 +27,7 @@ class Controller:
             #     self.current_event = None
             #     break
         
-    def get_status(self):
+    def get_status(self, session=None):
         return self.player_status
     def update_status(self, optionId):
         if self.update_status_finish:
