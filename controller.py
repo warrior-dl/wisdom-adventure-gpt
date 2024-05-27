@@ -49,8 +49,8 @@ class Controller:
         for option in event["eventOptions"]:
             if option["optionId"] == optionId:
                 return option
-    async def chat_with_guider(self, input):
-        output = await self.llm.chat_with_guider(input)
+    def chat_with_guider(self, input):
+        output = self.llm.chat_with_guider(input)
         logger.info("controllerguider: {}".format(output))
         return output
     

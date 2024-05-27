@@ -1,6 +1,7 @@
 import gradio as gr
 from loguru import logger
 from controller import Controller
+from langchain.schema import AIMessage, HumanMessage
 
 controller = Controller()
 def submit(option):
@@ -33,12 +34,20 @@ def start():
     radio = gr.Radio(str_options,label="选项")
     return event["eventContent"], radio
 
-async def bot(message, history):
-    logger.info("user message: {}".format(message))
-    bot_message = await controller.chat_with_guider(message)
-    logger.info("bot message: {}".format(bot_message))
-    history.append((message, bot_message))
-    return "", history
+def bot(message, history):
+    history_langchain_format = []
+    for human, ai in history:
+        history_langchain_format.append(HumanMessage(content=human))
+        history_langchain_format.append(AIMessage(content=ai))
+    history_langchain_format.append(HumanMessage(content=message))
+    logger.info("history_langchain_format: {}", history_langchain_format)
+    gpt_response = controller.chat_with_guider(history_langchain_format)
+    partial_message = ""
+    for chunk in gpt_response:
+        logger.info("chunk: {}", chunk)
+        partial_message = partial_message + chunk
+        yield partial_message
+
 def add_text(history, text):
     history = history + [(text, None)]
     return history, ""
@@ -65,9 +74,7 @@ if __name__ == '__main__':
             options = gr.Radio(label="选项", choices=[])
             submit_button = gr.Button("提交")
             result = gr.Textbox(label="事件结果")
-            chatbot = gr.Chatbot(label="小桨")
-            user_input = gr.Textbox(label="用户输入")
-            user_input.submit(bot, [user_input, chatbot], [user_input, chatbot])
+            gr.ChatInterface(bot)
             submit_button.click(submit,[options],[result, resource])
             start_button.click(start,[],[event, options])
 
