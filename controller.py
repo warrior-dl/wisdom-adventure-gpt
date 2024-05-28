@@ -14,21 +14,19 @@ class Controller:
             return None
         status = self.status_manager.get_status_with_session(session) 
         return status.get_cur_event()
-    def update_event(self, session):
+    def update_event(self, session) :
         status = self.status_manager.get_status_with_session(session)
         while True:
             index, event = self.event_manager.get_event_random()
             if not status.is_in_history(index):
                 status.set_cur_event(event)
                 status.add_history(index)
-                break
+                return True
             elif len(status.get_history()) == len(self.event_manager.event_list):
                 logger.info("No more event")
                 # TODO: 结算
                 self.current_event = None
-                break
-        # update status
-        # self.status_manager.set_status_with_session(session, status)
+                return False
             
     def get_resource(self, session=None):
         status = self.status_manager.get_status_with_session(session)

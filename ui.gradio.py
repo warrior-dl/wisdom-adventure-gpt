@@ -24,11 +24,14 @@ def submit(session, option):
 
 def start(session):
     logger.info("session: {}".format(session))
-    controller.update_event(session)
+    ret = controller.update_event(session)
+    if not ret:
+        logger.info("No more event")
+        return "恭喜！你已完成所有探险事件！", None
     event = controller.get_event(session).content
     if event is None:
         logger.error("No event")
-        return
+        return "恭喜！你已完成所有探险事件！", None
     logger.info("event: {}".format(event))
     options = event["eventOptions"]
     str_options = [f"{option['optionId']}: {option['optionContent']}" for option in options]
