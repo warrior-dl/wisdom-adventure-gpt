@@ -17,15 +17,15 @@ def submit(session, option):
         optionId = int(optionId)
     except:
         logger.error("optionId is not int: {}".format(optionId))
-    controller.update_status(optionId)
-    result = controller.get_event_option(optionId)["result"]
+    controller.update_resource(session, optionId)
+    result = controller.get_event_option(session, optionId)["result"]
     return result, display_status(session)
 
 
 def start(session):
     logger.info("session: {}".format(session))
-    controller.update_event()
-    event = controller.get_event()
+    controller.update_event(session)
+    event = controller.get_event(session).content
     if event is None:
         logger.error("No event")
         return
@@ -58,7 +58,7 @@ def add_text(history, text):
 def display_status(session=None) -> str:
     """Return a markdown string displaying the player's status."""
     logger.info("session: {}", session)
-    status = controller.get_status()
+    status = controller.get_resource(session)
     return (
         "## 游戏资源 <br /> \n"
         f"### **星际货币**: {status.stellarCurrency}  "

@@ -1,7 +1,19 @@
 import os
 import json
 import random
+import copy
 from loguru import logger
+
+class Event:
+    def __init__(self, id, event_json):
+        self.content = event_json
+        self.id = id
+        self.used = False
+    def get_award(self, id) -> tuple:
+        for option in self.content["eventOptions"]:
+            if option["optionId"] == id:
+                return option["award"]["key"], option["award"]["value"]
+        return None
 
 class EventManager:
     def __init__(self, event_list_path, original_event_path):
@@ -20,7 +32,6 @@ class EventManager:
             except json.decoder.JSONDecodeError:
                 logger.warning('JSONDecodeError: {}'.format(path))
                 self.event_list = []
-
     def load_original_event(self, path):
         if path is None:
             logger.warning('original event path is None')
@@ -36,15 +47,7 @@ class EventManager:
         if len(self.event_list) == 0:
             return None
         index = random.randint(0, len(self.event_list)-1)
-        return index, self.event_list[index]
-    
-    def get_award(self, event, id) -> tuple:
-        if event is None:
-            return None
-        for option in event["eventOptions"]:
-            if option["optionId"] == id:
-                return option["award"]["key"], option["award"]["value"]
-        return None
+        return index, Event(index, self.event_list[index])
     
     def get_original_event_by_index(self, index):
         if index < 0 or index >= len(self.original_event):

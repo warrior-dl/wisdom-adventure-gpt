@@ -1,52 +1,56 @@
-from status import PlayerStatus
+from status import PlayerStatus, StatusManager
 from event import EventManager
 from loguru import logger
 from llm import LLM
 class Controller:
 
     def __init__(self):
-        self.player_status = PlayerStatus(100, 50, 10, 0)
+        self.status_manager = StatusManager()
         self.event_manager = EventManager("data/event_list.json", "data/data.json")
-        self.current_event = None
-        self.update_status_finish = False
-        self.history = []
         self.llm = LLM()
-    def get_event(self):
-        return self.current_event
-    def update_event(self):
-        # while True:
+    def get_event(self, session=None):
+        if session is None:
+            logger.error("session is None")
+            return None
+        status = self.status_manager.get_status_with_session(session) 
+        return status.get_cur_event()
+    def update_event(self, session):
+        status = self.status_manager.get_status_with_session(session)
+        while True:
             index, event = self.event_manager.get_event_random()
-            # if index not in self.history:
-            self.current_event = event
-            self.update_status_finish = False
-            self.history.append(index)
-            #     break
-            # elif len(self.history) == len(self.event_manager.event_list):
-            #     logger.info("No more event")
-            #     # TODO: 结算
-            #     self.current_event = None
-            #     break
-        
-    def get_status(self, session=None):
-        return self.player_status
-    def update_status(self, optionId):
-        if self.update_status_finish:
-            logger.info("had update status, not need update again")
-            return
-        event = self.current_event
-        if event is None:
-            logger.info("current event is None")
-            return
-        key, value = self.event_manager.get_award(event, optionId)
-        if key is not None:
-            self.player_status.update(key, self.player_status.get_value(key) + value)
-        self.update_status_finish = True
+            if not status.is_in_history(index):
+                status.set_cur_event(event)
+                status.add_history(index)
+                break
+            elif len(status.get_history()) == len(self.event_manager.event_list):
+                logger.info("No more event")
+                # TODO: 结算
+                self.current_event = None
+                break
+        # update status
+        # self.status_manager.set_status_with_session(session, status)
+            
+    def get_resource(self, session=None):
+        status = self.status_manager.get_status_with_session(session)
+        return status.get_resource()
 
-    def get_event_option(self, optionId):
-        event = self.current_event
+    def update_resource(self, session, optionId):
+        status = self.status_manager.get_status_with_session(session)
+        cur_event = status.get_cur_event()
+        if cur_event is None:
+            logger.warning("current event is None")
+            return
+        key, value = cur_event.get_award(optionId)
+        if key is not None:
+            logger.info(f"award: key: {key}, value: {value}")
+            status.update_resource(key, status.resource.get_value(key) + value)
+
+    def get_event_option(self, session, optionId):
+        status = self.status_manager.get_status_with_session(session)
+        event = status.get_cur_event()
         if event is None:
             return
-        for option in event["eventOptions"]:
+        for option in event.content["eventOptions"]:
             if option["optionId"] == optionId:
                 return option
     def chat_with_guider(self, input):
