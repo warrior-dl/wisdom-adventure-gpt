@@ -27,6 +27,7 @@ class Voice:
         self.resample_rate(audio, wavfile)
         # 读取音频文件
         raw_audio = open(wavfile, "rb").read()
+        os.remove(wavfile)
         # 准备数据
         content_data = {"audio_format": "wav", "raw_audio": raw_audio, "rate": 16000}
         msg = appbuilder.Message(content_data)

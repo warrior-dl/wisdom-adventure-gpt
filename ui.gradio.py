@@ -1,5 +1,6 @@
 import gradio as gr
 import uuid
+import time
 from io import BytesIO
 import base64
 from loguru import logger
@@ -43,9 +44,7 @@ def start(session):
     radio = gr.Radio(str_options,label="选项")
     return event["eventContent"], radio
 
-def bot(message, history, mic = None):
-    if mic is not None:
-        logger.info("mic: {}", mic)
+def bot(message, history):
     history_langchain_format = []
     for human, ai in history:
         history_langchain_format.append(HumanMessage(content=human))
@@ -53,11 +52,13 @@ def bot(message, history, mic = None):
     history_langchain_format.append(HumanMessage(content=message))
     logger.info("history_langchain_format: {}", history_langchain_format)
     gpt_response = controller.chat_with_guider(history_langchain_format)
-    partial_message = ""
+    history = history + [[message, None]]
+    history[-1][1] = ""
     for chunk in gpt_response:
         logger.info("chunk: {}", chunk)
-        partial_message = partial_message + chunk
-        yield partial_message
+        history[-1][1] += chunk
+        time.sleep(0.05)
+        yield history
 
 def add_text(history, text):
     history = history + [(text, None)]
@@ -96,10 +97,11 @@ def chat_with_audio(file_path, chatbot):
     logger.info("chatbot: {}", chatbot)
     return chatbot
 
-def reverse_audio(audio):
+def asr_audio(audio):
     logger.info("audio: {}", audio)
     asr = controller.get_asr(audio)
-    logger.info("asr: {}", asr)
+    logger.info("asr: {}", asr["result"])
+    return None, asr["result"][0]
 
 if __name__ == '__main__':
     with gr.Blocks(title='wisdom-adventure', theme=gr.themes.Soft()) as demo:
@@ -124,9 +126,12 @@ if __name__ == '__main__':
                 ),
                 type="filepath",
             )
-            gr.ChatInterface(bot)
+            chatbot = gr.Chatbot()
+            msg = gr.Textbox()
+            msg.submit(bot, [msg, chatbot], chatbot)
             submit_button.click(submit,[session, options],[result, resource]).then(event_speech, [result], [event_result_tts])
             start_button.click(start,[session],[event, options]).then(event_speech, [event], [event_content_tts])
-            input_audio.change(reverse_audio, input_audio)
+            audio_text = gr.Textbox(visible=False)
+            input_audio.stop_recording(asr_audio, [input_audio], [input_audio, audio_text]).then(bot, [audio_text, chatbot], chatbot)
 
     demo.queue().launch(server_name="0.0.0.0")
