@@ -1,5 +1,6 @@
 from status import PlayerStatus, StatusManager
 from event import EventManager
+from voice import Voice
 from loguru import logger
 from llm import LLM
 class Controller:
@@ -8,6 +9,7 @@ class Controller:
         self.status_manager = StatusManager()
         self.event_manager = EventManager("data/event_list.json", "data/data.json")
         self.llm = LLM()
+        self.voice = Voice()
     def get_event(self, session=None):
         if session is None:
             logger.error("session is None")
@@ -56,6 +58,10 @@ class Controller:
         logger.info("controllerguider: {}".format(output))
         return output
     
-
+    def get_tts(self, text):
+        return self.voice.get_tts(text)
+    
+    def get_asr(self, audio):
+        return self.voice.get_asr(audio)
 
     

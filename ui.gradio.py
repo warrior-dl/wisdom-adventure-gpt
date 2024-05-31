@@ -1,8 +1,11 @@
 import gradio as gr
 import uuid
+from io import BytesIO
+import base64
 from loguru import logger
 from controller import Controller
 from langchain.schema import AIMessage, HumanMessage
+
 
 controller = Controller()
 def submit(session, option):
@@ -40,7 +43,9 @@ def start(session):
     radio = gr.Radio(str_options,label="选项")
     return event["eventContent"], radio
 
-def bot(message, history):
+def bot(message, history, mic = None):
+    if mic is not None:
+        logger.info("mic: {}", mic)
     history_langchain_format = []
     for human, ai in history:
         history_langchain_format.append(HumanMessage(content=human))
@@ -77,6 +82,25 @@ def generate_session_id() -> str:
     logger.info("session")
     return str(uuid.uuid4())
 
+def event_speech(text):
+    tts = controller.get_tts(text)
+
+    audio_bytes = BytesIO(tts)
+    audio = base64.b64encode(audio_bytes.read()).decode("utf-8")
+    audio_player = f'<audio src="data:audio/mpeg;base64,{audio}" controls autoplay></audio>'
+
+    return audio_player
+
+def chat_with_audio(file_path, chatbot):
+    logger.info("file_path: {}", file_path)
+    logger.info("chatbot: {}", chatbot)
+    return chatbot
+
+def reverse_audio(audio):
+    logger.info("audio: {}", audio)
+    asr = controller.get_asr(audio)
+    logger.info("asr: {}", asr)
+
 if __name__ == '__main__':
     with gr.Blocks(title='wisdom-adventure', theme=gr.themes.Soft()) as demo:
         session = gr.State(generate_session_id)
@@ -85,11 +109,24 @@ if __name__ == '__main__':
             resource = gr.Markdown(label="游戏资源", value=display_status())
             start_button = gr.Button("出发")
             event = gr.Textbox(label="事件内容")
+            event_content_tts = gr.HTML()
             options = gr.Radio(label="选项", choices=[])
             submit_button = gr.Button("提交")
             result = gr.Textbox(label="事件结果")
+            event_result_tts = gr.HTML()
+            input_audio = gr.Audio(
+                sources=["microphone"],
+                waveform_options=gr.WaveformOptions(
+                    waveform_color="#01C6FF",
+                    waveform_progress_color="#0066B4",
+                    skip_length=2,
+                    show_controls=False,
+                ),
+                type="filepath",
+            )
             gr.ChatInterface(bot)
-            submit_button.click(submit,[session, options],[result, resource])
-            start_button.click(start,[session],[event, options])
+            submit_button.click(submit,[session, options],[result, resource]).then(event_speech, [result], [event_result_tts])
+            start_button.click(start,[session],[event, options]).then(event_speech, [event], [event_content_tts])
+            input_audio.change(reverse_audio, input_audio)
 
     demo.queue().launch(server_name="0.0.0.0")
