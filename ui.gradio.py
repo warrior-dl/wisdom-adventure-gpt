@@ -92,6 +92,20 @@ def event_speech(text):
 
     return audio_player
 
+def bot_speech(history):
+    logger.info("history: {}", history)
+    text = history[-1][1]
+    logger.info("text: {}", text)
+    tts = controller.get_tts(text)
+
+    audio_bytes = BytesIO(tts)
+    audio = base64.b64encode(audio_bytes.read()).decode("utf-8")
+    audio_player = f'<audio src="data:audio/mpeg;base64,{audio}" controls autoplay></audio>'
+
+    return audio_player
+
+def clear_text(text):
+    return ""
 def chat_with_audio(file_path, chatbot):
     logger.info("file_path: {}", file_path)
     logger.info("chatbot: {}", chatbot)
@@ -115,7 +129,7 @@ if __name__ == '__main__':
             options = gr.Radio(label="选项", choices=[])
             submit_button = gr.Button("提交")
             result = gr.Textbox(label="事件结果")
-            event_result_tts = gr.HTML()
+            # event_result_tts = gr.HTML()
             input_audio = gr.Audio(
                 sources=["microphone"],
                 waveform_options=gr.WaveformOptions(
@@ -128,8 +142,8 @@ if __name__ == '__main__':
             )
             chatbot = gr.Chatbot()
             msg = gr.Textbox()
-            msg.submit(bot, [msg, chatbot], chatbot)
-            submit_button.click(submit,[session, options],[result, resource]).then(event_speech, [result], [event_result_tts])
+            msg.submit(clear_text, msg, msg).then(bot, [msg, chatbot], chatbot).then(bot_speech, [chatbot], [event_content_tts])
+            submit_button.click(submit,[session, options],[result, resource]).then(event_speech, [result], [event_content_tts])
             start_button.click(start,[session],[event, options]).then(event_speech, [event], [event_content_tts])
             audio_text = gr.Textbox(visible=False)
             input_audio.stop_recording(asr_audio, [input_audio], [input_audio, audio_text]).then(bot, [audio_text, chatbot], chatbot)
