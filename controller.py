@@ -53,8 +53,8 @@ class Controller:
         for option in event.get_content()["eventOptions"]:
             if option["optionId"] == optionId:
                 return option
-    def chat_with_guider(self, input):
-        output = self.llm.chat_with_guider(input)
+    def chat_with_guider(self, input, event_content):
+        output = self.llm.chat_with_guider(input, event_content)
         logger.info("controller guider: {}", output)
         return output
     
@@ -63,17 +63,20 @@ class Controller:
         logger.info("event npc: {}", output)
         return output
     def chat(self, input, session = None):
+        event_content = ""
         if session is not None:
             status = self.status_manager.get_status_with_session(session)
             event = status.get_cur_event()
             if event is not None:
+                # TODO: 需要去除event_content中的奖励结果
+                event_content = event.get_content()
                 if event.get_type() == "characterInteraction":
                     id = event.get_id()
                     background = event.get_background()
                     purpose = event.get_purpose()
                     knowledge = self.event_manager.get_original_event_by_index(id)
                     return self.chat_with_npc(input, background, purpose, knowledge)
-        return self.chat_with_guider(input)
+        return self.chat_with_guider(input, event_content)
     
     def get_tts(self, text):
         return self.voice.get_tts(text)

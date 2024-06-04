@@ -28,7 +28,7 @@ class LLM:
 
         memory = SlidingWindowMemory(max_round=5)
         llm_final = ERNIEBot(model="ernie-3.5", api_type="aistudio", enable_multi_step_tool_call=True)
-        guider_prompt = "你是智途问答大冒险中的游戏助手，叫做小桨，你负责陪伴玩家在太空进行探险，用比较通俗易懂的方式解答玩家遇到的问题。\n"
+        guider_prompt = "你是智途问答大冒险中的游戏助手，叫做小桨，你负责陪伴玩家在太空进行探险，用比较通俗易懂的方式解答玩家遇到的问题。当前游戏事件如下：{event_content}\n"
         self.guider_agent_all = FunctionAgent(llm=llm_final, tools=[], memory=memory, system=guider_prompt)
 
         self.guider_prompt = ChatPromptTemplate.from_messages(
@@ -47,12 +47,12 @@ class LLM:
                 MessagesPlaceholder(variable_name="messages"),
             ]
         )
-    def chat_with_guider(self, input):
+    def chat_with_guider(self, input, event_content):
         retries = 3
         for _ in range(retries):
             try:
                 chain  = self.guider_prompt | self.llm | StrOutputParser()
-                response = chain.stream({"messages": input})
+                response = chain.stream({"messages": input, "event_content": event_content})
                 return response
             except Exception as e:
                 logger.error(e)
