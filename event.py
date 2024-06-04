@@ -3,17 +3,34 @@ import json
 import random
 import copy
 from loguru import logger
+from enum import Enum
+
+class EventType(Enum):
+    # characterInteraction|choice|resourceDecision
+    characterInteraction = 1
+    choice = 2
+    resourceDecision = 3
 
 class Event:
     def __init__(self, id, event_json):
         self.content = event_json
         self.id = id
         self.used = False
+    def get_id(self):
+        return self.id
     def get_award(self, id) -> tuple:
         for option in self.content["eventOptions"]:
             if option["optionId"] == id:
                 return option["award"]["key"], option["award"]["value"]
         return None
+    def get_type(self):
+        return self.content["eventType"]
+    def get_background(self):
+        return self.content["eventCharacters"]["background"]
+    def get_purpose(self):
+        return self.content["eventCharacters"]["purpose"]
+    def get_content(self):
+        return self.content
 
 class EventManager:
     def __init__(self, event_list_path, original_event_path):

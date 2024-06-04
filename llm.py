@@ -44,8 +44,7 @@ class LLM:
                             "背景：{background}\n" \
                             "目的：{purpose}\n" \
                             "科普知识：{knowledge}\n"),
-                ("human", "{input}"),
-                ("ai", ""),
+                MessagesPlaceholder(variable_name="messages"),
             ]
         )
     def chat_with_guider(self, input):
@@ -60,5 +59,14 @@ class LLM:
                 time.sleep(1)  # Retry after 1 second
         raise Exception("Failed after {} retries".format(retries))
 
-
-    
+    def chat_with_npc(self, input, background, purpose, knowledge):
+        retries = 3
+        for _ in range(retries):
+            try:
+                chain  = self.npc_prompt | self.llm | StrOutputParser()
+                response = chain.stream({"messages": input, "background": background, "purpose": purpose, "knowledge": knowledge})
+                return response
+            except Exception as e:
+                logger.error(e)
+                time.sleep(1)  # Retry after 1 second
+        raise Exception("Failed after {} retries".format(retries))

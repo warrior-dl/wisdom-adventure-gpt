@@ -26,41 +26,67 @@ def submit(session, option):
     return result, display_status(session)
 
 
-def start(session):
+def start(session, chatbot, chatbot_history):
     logger.info("session: {}".format(session))
+    old = controller.get_event(session)
+    old_event_type = None
+    if old is not None:
+        old_event_type = controller.get_event(session).get_type()
     ret = controller.update_event(session)
     if not ret:
         logger.info("No more event")
         return "恭喜！你已完成所有探险事件！", None
-    event = controller.get_event(session).content
+    event = controller.get_event(session).get_content()
     if event is None:
         logger.error("No event")
         return "恭喜！你已完成所有探险事件！", None
     logger.info("event: {}".format(event))
+    new_event_type = controller.get_event(session).get_type()
+    logger.info("old_event_type: {}", old_event_type)
+    logger.info("now event type: {}", new_event_type)
+    if old_event_type != None:
+        # 非角色事件切换到角色事件
+        if old_event_type != "characterInteraction" and new_event_type == "characterInteraction":
+            chatbot_history = chatbot
+            chatbot = []
+        # 角色事件切换到非角色事件
+        if old_event_type == "characterInteraction" and new_event_type != "characterInteraction":
+            chatbot = chatbot_history
+        # 角色事件切换到角色事件
+        if old_event_type == "characterInteraction" and new_event_type == "characterInteraction":
+            chatbot = []
+
     options = event["eventOptions"]
     str_options = [f"{option['optionId']}: {option['optionContent']}" for option in options]
     logger.info("content: {}".format(event["eventContent"]))
     logger.info("options: {}".format(str_options))
     radio = gr.Radio(str_options,label="选项")
-    return event["eventContent"], radio
+    return event["eventContent"], radio, chatbot, chatbot_history
 
-def bot(message, history):
+def update_bot(event, chatbot, chatbot_history):
+    if event.get_type() == "characterInteraction":
+        chatbot_history = chatbot
+        return [[]], chatbot_history
+
+
+def bot(session, message, history):
     history_langchain_format = []
+    logger.info("history: {}", history)
     for human, ai in history:
         history_langchain_format.append(HumanMessage(content=human))
         history_langchain_format.append(AIMessage(content=ai))
     history_langchain_format.append(HumanMessage(content=message))
     logger.info("history_langchain_format: {}", history_langchain_format)
-    gpt_response = controller.chat_with_guider(history_langchain_format)
+    gpt_response = controller.chat(history_langchain_format, session)
     history = history + [[message, None]]
     history[-1][1] = ""
     for chunk in gpt_response:
         logger.info("chunk: {}", chunk)
         history[-1][1] += chunk
         time.sleep(0.05)
-        yield history
+        yield "", history
 
-def add_text(history, text):
+def add_text(history, text, chatbot):
     history = history + [(text, None)]
     return history, ""
 
@@ -94,6 +120,8 @@ def event_speech(text):
 
 def bot_speech(history):
     logger.info("history: {}", history)
+    if history == []:
+        return None
     text = history[-1][1]
     logger.info("text: {}", text)
     tts = controller.get_tts(text)
@@ -104,8 +132,6 @@ def bot_speech(history):
 
     return audio_player
 
-def clear_text(text):
-    return ""
 def chat_with_audio(file_path, chatbot):
     logger.info("file_path: {}", file_path)
     logger.info("chatbot: {}", chatbot)
@@ -120,6 +146,7 @@ def asr_audio(audio):
 if __name__ == '__main__':
     with gr.Blocks(title='wisdom-adventure', theme=gr.themes.Soft()) as demo:
         session = gr.State(generate_session_id)
+        chatbot_history = gr.State([])
         with gr.Column():
             intro = gr.Markdown(value=introduce())
             resource = gr.Markdown(label="游戏资源", value=display_status())
@@ -142,10 +169,12 @@ if __name__ == '__main__':
             )
             chatbot = gr.Chatbot()
             msg = gr.Textbox()
-            msg.submit(clear_text, msg, msg).then(bot, [msg, chatbot], chatbot).then(bot_speech, [chatbot], [event_content_tts])
+            msg.submit(bot, [session, msg, chatbot], [msg, chatbot]).then(bot_speech, [chatbot], [event_content_tts])
             submit_button.click(submit,[session, options],[result, resource]).then(event_speech, [result], [event_content_tts])
-            start_button.click(start,[session],[event, options]).then(event_speech, [event], [event_content_tts])
+            start_button.click(start,[session, chatbot, chatbot_history],[event, options, chatbot, chatbot_history]).then(event_speech, [event], [event_content_tts])
             audio_text = gr.Textbox(visible=False)
-            input_audio.stop_recording(asr_audio, [input_audio], [input_audio, audio_text]).then(bot, [audio_text, chatbot], chatbot)
+            input_audio.stop_recording(asr_audio, [input_audio], [input_audio, audio_text]).then(
+                bot, [session, audio_text, chatbot], [audio_text, chatbot]).then(
+                    bot_speech, [chatbot], [event_content_tts])
 
     demo.queue().launch(server_name="0.0.0.0")

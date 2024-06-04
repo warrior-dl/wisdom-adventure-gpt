@@ -50,13 +50,30 @@ class Controller:
         event = status.get_cur_event()
         if event is None:
             return
-        for option in event.content["eventOptions"]:
+        for option in event.get_content()["eventOptions"]:
             if option["optionId"] == optionId:
                 return option
     def chat_with_guider(self, input):
         output = self.llm.chat_with_guider(input)
-        logger.info("controllerguider: {}".format(output))
+        logger.info("controller guider: {}", output)
         return output
+    
+    def chat_with_npc(self, input, background, purpose, knowledge):
+        output = self.llm.chat_with_npc(input, background, purpose, knowledge)
+        logger.info("event npc: {}", output)
+        return output
+    def chat(self, input, session = None):
+        if session is not None:
+            status = self.status_manager.get_status_with_session(session)
+            event = status.get_cur_event()
+            if event is not None:
+                if event.get_type() == "characterInteraction":
+                    id = event.get_id()
+                    background = event.get_background()
+                    purpose = event.get_purpose()
+                    knowledge = self.event_manager.get_original_event_by_index(id)
+                    return self.chat_with_npc(input, background, purpose, knowledge)
+        return self.chat_with_guider(input)
     
     def get_tts(self, text):
         return self.voice.get_tts(text)
