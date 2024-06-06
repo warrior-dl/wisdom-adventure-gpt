@@ -9,20 +9,48 @@ from langchain.schema import AIMessage, HumanMessage
 
 
 controller = Controller()
-def submit(session, option):
+
+def format_history(history, message):
+    history_langchain_format = []
+    for human, ai in history:
+        history_langchain_format.append(HumanMessage(content=human))
+        history_langchain_format.append(AIMessage(content=ai))
+    history_langchain_format.append(HumanMessage(content=message))
+    return history_langchain_format
+
+def submit(session, option, history):
     logger.info("session: {}, option: {}".format(session, option))
-    if option == []:
-        return
-    logger.info("player options: {}".format(option))
-    ## 取出option中: 前的数字id
-    optionId = option.split(":")[0]
-    # 转为int
+    event = controller.get_event(session)
+    if event is not None and event.get_type() == "characterInteraction":
+        langchain_format = format_history(history, "")
+        try:
+            optionId = controller.referee_judge(session, langchain_format)
+        except:
+            logger.error("referee failed")
+            optionId = None
+    else:
+        if option == []:
+            return None, display_status(session)
+        logger.info("player options: {}".format(option))
+        try:
+            ## 取出option中: 前的数字id
+            optionId = option.split(":")[0]
+            # 转为int
+            optionId = int(optionId)
+        except:
+            optionId = None
+            logger.error("optionId is not int: {}".format(optionId))
+    if optionId is None:
+        return None, display_status(session)
+
     try:
-        optionId = int(optionId)
+        logger.info("optionId: {}".format(optionId))
+        controller.update_resource(session, optionId)
+        result = controller.get_event_option(session, optionId)["result"]
     except:
-        logger.error("optionId is not int: {}".format(optionId))
-    controller.update_resource(session, optionId)
-    result = controller.get_event_option(session, optionId)["result"]
+        result = None
+        logger.error("get_event_option failed: {}", optionId)
+
     return result, display_status(session)
 
 
@@ -35,11 +63,11 @@ def start(session, chatbot, chatbot_history):
     ret = controller.update_event(session)
     if not ret:
         logger.info("No more event")
-        return "恭喜！你已完成所有探险事件！", None
+        return "恭喜！你已完成所有探险事件！", None, chatbot, chatbot_history
     event = controller.get_event(session).get_content()
     if event is None:
         logger.error("No event")
-        return "恭喜！你已完成所有探险事件！", None
+        return "恭喜！你已完成所有探险事件！", None, chatbot, chatbot_history
     logger.info("event: {}".format(event))
     new_event_type = controller.get_event(session).get_type()
     logger.info("old_event_type: {}", old_event_type)
@@ -58,24 +86,18 @@ def start(session, chatbot, chatbot_history):
 
     options = event["eventOptions"]
     str_options = [f"{option['optionId']}: {option['optionContent']}" for option in options]
+    if new_event_type == "characterInteraction":
+        str_options = []
     logger.info("content: {}".format(event["eventContent"]))
     logger.info("options: {}".format(str_options))
     radio = gr.Radio(str_options,label="选项")
     return event["eventContent"], radio, chatbot, chatbot_history
 
-def update_bot(event, chatbot, chatbot_history):
-    if event.get_type() == "characterInteraction":
-        chatbot_history = chatbot
-        return [[]], chatbot_history
-
+def clear_result():
+    return ""
 
 def bot(session, message, history):
-    history_langchain_format = []
-    logger.info("history: {}", history)
-    for human, ai in history:
-        history_langchain_format.append(HumanMessage(content=human))
-        history_langchain_format.append(AIMessage(content=ai))
-    history_langchain_format.append(HumanMessage(content=message))
+    history_langchain_format = format_history(history, message)
     logger.info("history_langchain_format: {}", history_langchain_format)
     gpt_response = controller.chat(history_langchain_format, session)
     history = history + [[message, None]]
@@ -110,6 +132,8 @@ def generate_session_id() -> str:
     return str(uuid.uuid4())
 
 def event_speech(text):
+    if text == "" or text is None:
+        return None
     tts = controller.get_tts(text)
 
     audio_bytes = BytesIO(tts)
@@ -170,8 +194,8 @@ if __name__ == '__main__':
             chatbot = gr.Chatbot()
             msg = gr.Textbox()
             msg.submit(bot, [session, msg, chatbot], [msg, chatbot]).then(bot_speech, [chatbot], [event_content_tts])
-            submit_button.click(submit,[session, options],[result, resource]).then(event_speech, [result], [event_content_tts])
-            start_button.click(start,[session, chatbot, chatbot_history],[event, options, chatbot, chatbot_history]).then(event_speech, [event], [event_content_tts])
+            submit_button.click(submit,[session, options, chatbot],[result, resource]).then(event_speech, [result], [event_content_tts])
+            start_button.click(start,[session, chatbot, chatbot_history],[event, options, chatbot, chatbot_history]).then(clear_result, [], [result]).then(event_speech, [event], [event_content_tts])
             audio_text = gr.Textbox(visible=False)
             input_audio.stop_recording(asr_audio, [input_audio], [input_audio, audio_text]).then(
                 bot, [session, audio_text, chatbot], [audio_text, chatbot]).then(

@@ -37,7 +37,7 @@ async def main():
         messages = [HumanMessage(content=json.dumps(question, ensure_ascii=False))]
         ai_message = await model.chat(messages=messages)
         print("----------------------------------------------------")
-        # print(ai_message.content)
+        print(ai_message.content)
         try :
             # 删除```json```
             content = ai_message.content.replace("```json", "").replace("```", "")

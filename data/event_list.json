@@ -1,51 +1,51 @@
 [
     {
-        "eventName": "发现神秘的类星体",
-        "eventContent": "在星际大冒险的旅途中，你的飞船意外发现了一个看似恒星但并非恒星的天体——类星体。它似乎隐藏着无尽的秘密，等待着你去揭开。",
+        "eventName": "探索类星体的秘密",
+        "eventContent": "你的星际飞船无意中进入了一个未知的星系，这里充满了强烈的射电辐射。经过观测，你发现了一种与恒星极为相似但能量巨大的天体——类星体。你需要深入了解这些神秘的天体。",
         "eventType": "characterInteraction",
         "eventCharacters": {
-            "background": "你是一位勇敢的星际探险家，对未知充满好奇。",
-            "purpose": "你希望与这个神秘的天体进行交互，了解它的秘密。"
+            "background": "你遇到了一个来自未知文明的星际旅行者，他对于类星体有着深入的研究。",
+            "purpose": "他希望与你分享他的知识，同时希望从你这里了解更多关于其他星系的信息。"
         },
         "eventOptions": [
             {
                 "optionId": 1,
-                "optionContent": "你决定使用飞船的先进仪器对类星体进行详细观测。",
-                "result": "你成功地捕捉到了类星体的光谱数据，并发现其中含有许多宽而强的发射线，这些谱线似乎与已知的元素都不匹配。",
+                "optionContent": "你询问星际旅行者关于类星体的能量来源。",
+                "result": "星际旅行者向你解释了类星体能量之谜，他提到超大质量黑洞可能是能量的源泉。你对此感到震撼，也对宇宙的奥秘有了更深的认识。",
                 "award": {
                     "key": "explorationCapability",
                     "value": 10
-                },
-                "precondition": {
-                    "operator": ">",
-                    "threshold": 5,
-                    "key": "shipEnergy"
                 }
             },
             {
                 "optionId": 2,
-                "optionContent": "你试图与类星体建立通讯连接，了解它的起源和性质。",
-                "result": "你的尝试失败了，类星体似乎没有任何响应，它的内部机制完全超出了你的理解范围。",
+                "optionContent": "你尝试向星际旅行者分享你所了解的星系知识，但发现你们的信息差异很大。",
+                "result": "星际旅行者似乎对你的分享不太感兴趣，他更关注类星体的研究。你觉得有些尴尬，但也意识到不同文明之间的知识差异是普遍存在的。",
                 "award": {
-                    "key": "reputationValue",
-                    "value": -5
+                    "key": "explorationCapability",
+                    "value": 5
+                },
+                "precondition": {
+                    "operator": "<",
+                    "threshold": 20,
+                    "key": "explorationCapability"
                 }
             }
         ]
     },
     {
-        "eventName": "哈雷彗星的命名起源",
-        "eventContent": "你在星际图书馆中翻阅古老的天文资料，突然一个关于哈雷彗星命名的故事吸引了你的注意。你想了解更多关于这个特殊命名的由来。",
+        "eventName": "哈雷彗星的命名之谜",
+        "eventContent": "你在星际大冒险中偶然遇到了一位天文学家，他向你讲述了哈雷彗星的独特命名背后的故事。他好奇地想知道你是否知道这个命名背后的原因。",
         "eventType": "characterInteraction",
         "eventCharacters": {
-            "background": "星际图书馆的管理员，拥有丰富的天文知识和历史资料。",
-            "purpose": "分享哈雷彗星命名的有趣故事，并解答你关于此事件的所有疑问。"
+            "background": "一位经验丰富的天文学家，对彗星研究有着浓厚的兴趣。",
+            "purpose": "科普哈雷彗星命名的历史背景，激发玩家的好奇心。"
         },
         "eventOptions": [
             {
                 "optionId": 1,
-                "optionContent": "询问哈雷彗星命名的起源。",
-                "result": "图书馆管理员详细地讲述了哈雷彗星命名的来龙去脉，包括哈雷的研究以及为何他的预言得到如此高的尊崇。",
+                "optionContent": "我知道哈雷彗星的名字是为了纪念爱德蒙·哈雷的预言。",
+                "result": "天文学家点点头，赞赏地说：“很好，你了解得不少。确实，哈雷彗星的名字是为了纪念哈雷对这颗彗星回归时间的准确预言。他的预言不仅验证了牛顿的万有引力定律，还开创了彗星研究的新篇章。不过，你知道哈雷是如何发现这个规律的吗？",
                 "award": {
                     "key": "explorationCapability",
                     "value": 5
@@ -53,135 +53,96 @@
             },
             {
                 "optionId": 2,
-                "optionContent": "询问是否有其他彗星也有特别的命名方式。",
-                "result": "管理员提到了几颗其他有特色命名的彗星，并分享了它们的故事，但重点还是放在了哈雷彗星上。",
+                "optionContent": "我不知道，愿闻其详。",
+                "result": "天文学家微笑着开始讲述：“哈雷通过深入研究历史记录，发现了几颗轨道相似的彗星，并预测了它们的回归时间。他的预言在后来得到了验证，为了纪念他的贡献，人们将这颗彗星命名为哈雷彗星。哈雷的这项研究不仅展示了他的智慧，也为后来的天文学研究提供了宝贵的启示。",
+                "award": {
+                    "key": "explorationCapability",
+                    "value": 10
+                }
+            }
+        ]
+    },
+    {
+        "eventName": "哈雷彗星穿越事件",
+        "eventContent": "你的星际飞船即将穿越哈雷彗星的彗尾，关于彗尾的传说和谣言四处流传，你需要做出明智的选择来确保飞船和船员的安全。",
+        "eventType": "choice",
+        "eventOptions": [
+            {
+                "optionId": 1,
+                "optionContent": "购买防护用具，确保安全。",
+                "result": "你选择了购买防护用具，但发现这些用具毫无用处，因为彗尾的气体极为稀薄，不会对飞船和船员造成任何影响。这浪费了大量资源。",
                 "award": {
                     "key": "stellarCurrency",
-                    "value": 3
+                    "value": -5
+                }
+            },
+            {
+                "optionId": 2,
+                "optionContent": "无视谣言，继续前行。",
+                "result": "你决定相信科学，无视那些关于彗尾有害的谣言，继续前行。飞船顺利穿过了彗尾，没有发生任何意外。",
+                "award": {
+                    "key": "explorationCapability",
+                    "value": 5
+                }
+            }
+        ]
+    },
+    {
+        "eventName": "深度撞击实验",
+        "eventContent": "在星际大冒险中，你遇到了一个模拟深度撞击实验的机会。你需要在实验室中与科学家进行交流，并做出决策来完成这次实验。",
+        "eventType": "characterInteraction",
+        "eventCharacters": {
+            "background": "实验室里，你遇到了一位资深的科学家，他正在进行一项关于彗星的研究。",
+            "purpose": "科学家希望通过模拟深度撞击实验，揭示彗星的内部结构以及其对太阳系起源和生命起源的影响。"
+        },
+        "eventOptions": [
+            {
+                "optionId": 1,
+                "optionContent": "表示对实验的好奇，询问更多关于彗星的信息。",
+                "result": "科学家详细解释了彗星的结构和特点，并强调了深度撞击实验的重要性。你获得了更多关于彗星的知识，对实验产生了浓厚的兴趣。",
+                "award": {
+                    "key": "explorationCapability",
+                    "value": 10
+                }
+            },
+            {
+                "optionId": 2,
+                "optionContent": "提出直接参与模拟实验，尝试释放撞击体并观察结果。",
+                "result": "科学家同意了你的请求，并指导你完成了模拟深度撞击实验。你亲眼目睹了撞击体撞上彗星模型的震撼场景，对彗星的内部结构有了直观的认识。同时，你也体验到了科学探索的乐趣和挑战。",
+                "award": {
+                    "key": "stellarCurrency",
+                    "value": 5
+                },
+                "precondition": {
+                    "operator": ">=",
+                    "threshold": 5,
+                    "key": "explorationCapability"
                 }
             },
             {
                 "optionId": 3,
-                "optionContent": "不感兴趣，离开图书馆。",
-                "result": "你失去了一个了解哈雷彗星命名故事的机会，回到了探险船上。",
+                "optionContent": "表示对实验不感兴趣，选择离开。",
+                "result": "你放弃了参与模拟深度撞击实验的机会，错过了学习和探索的绝佳时机。你离开了实验室，心中有些许遗憾。",
                 "award": {
-                    "key": "explorationCapability",
+                    "key": "stellarCurrency",
                     "value": -2
                 }
             }
         ]
     },
     {
-        "eventName": "彗星穿越危机",
-        "eventContent": "地球即将穿越哈雷彗星的彗尾，科学家们对此充满担忧。你需要帮助大家了解彗尾的真实情况，安抚民心。",
-        "eventType": "choice",
-        "eventOptions": [
-            {
-                "optionId": 1,
-                "optionContent": "相信报纸报道，积极购买防护用具，保护自己和他人。",
-                "result": "你选择了相信报纸的报道，购买了所谓的防护用具。但结果是，这完全是个误会，彗尾中的气体非常稀薄，不会对地球造成任何影响。你浪费了大量的时间和金钱，引发了不必要的恐慌。",
-                "award": {
-                    "key": "stellarCurrency",
-                    "value": -50
-                }
-            },
-            {
-                "optionId": 2,
-                "optionContent": "不相信报纸报道，寻求科学解释，告诉大家地球穿越彗尾是安全的。",
-                "result": "你选择了不相信报纸的报道，而是通过科学解释告诉大家真相。你找到了科学家们的辟谣声明，向大家解释彗尾中的气体极为稀薄，不会对地球造成任何影响。最终，地球平安穿过彗尾，所有人都安然无恙。你因此获得了大家的赞赏。",
-                "award": {
-                    "key": "reputationValue",
-                    "value": 20
-                }
-            }
-        ]
-    },
-    {
-        "eventName": "深度撞击计划",
-        "eventContent": "你的星际探险队发现了一颗彗星，并决定进行一次类似'深度撞击'的实验来探索它的内部物质。现在，你需要做出决策，如何进行这次撞击实验。",
-        "eventType": "resourceDecision",
-        "eventCharacters": {
-            "background": "你率领的星际探险队拥有丰富的太空探索经验，但对彗星的内部构造了解甚少。",
-            "purpose": "通过深度撞击实验，揭示彗星的内部构造，以了解太阳系的原始状态，同时为可能的彗星防御策略积累经验。"
-        },
-        "eventOptions": [
-            {
-                "optionId": 1,
-                "optionContent": "使用小型撞击器进行温和撞击，避免对彗星造成过大破坏。",
-                "result": "你选择了温和的撞击方式。撞击器成功击中了彗星，释放出的物质足够探测器进行分析。你们成功获取了关于彗星内部构造的数据，但对彗星的破坏较小，有利于进一步研究。",
-                "award": {
-                    "key": "explorationCapability",
-                    "value": 10
-                },
-                "precondition": {
-                    "operator": "<",
-                    "threshold": 50,
-                    "key": "shipEnergy"
-                }
-            },
-            {
-                "optionId": 2,
-                "optionContent": "使用大型撞击器进行猛烈撞击，以获取更多关于彗星内部的信息。",
-                "result": "你选择了猛烈的撞击方式。撞击器以巨大的力量撞击彗星，释放出了大量物质。虽然你们获得了丰富的数据，但彗星受到了较大的破坏，可能影响了后续的研究。",
-                "award": {
-                    "key": "explorationCapability",
-                    "value": 20
-                },
-                "precondition": {
-                    "operator": ">=",
-                    "threshold": 50,
-                    "key": "shipEnergy"
-                }
-            }
-        ]
-    },
-    {
-        "eventName": "探索疏散星团",
-        "eventContent": "在星际探索的旅途中，你偶然发现了一个疏散星团。这是一个由几十到上千颗恒星组成的松散联盟，它们的形态不规则，但聚集在一起形成了美丽的星团景象。你决定深入探索这个星团，了解更多关于它的秘密。",
-        "eventType": "resourceDecision",
-        "eventCharacters": {
-            "background": "你是一个勇敢的星际探险家，对未知世界充满好奇和热情。",
-            "purpose": "你的目的是探索这个疏散星团，了解它的结构、成员星分布以及可能存在的科学价值。"
-        },
-        "eventOptions": [
-            {
-                "optionId": 1,
-                "optionContent": "你使用高级望远镜仔细观测星团内的恒星，记录下它们的位置和亮度。",
-                "result": "你成功记录了星团内恒星的信息，这将为你后续的研究提供宝贵的资料。",
-                "award": {
-                    "key": "explorationCapability",
-                    "value": 10
-                },
-                "precondition": {
-                    "operator": ">",
-                    "threshold": 5,
-                    "key": "shipEnergy"
-                }
-            },
-            {
-                "optionId": 2,
-                "optionContent": "你试图分析星团内恒星的演化轨迹，但由于资料不足，无法得出准确的结论。",
-                "result": "你未能成功分析星团的演化轨迹，但这激发了你深入研究星团的兴趣。",
-                "award": {
-                    "key": "reputationValue",
-                    "value": 5
-                }
-            }
-        ]
-    },
-    {
-        "eventName": "探索古老星团",
-        "eventContent": "在星际大冒险的旅途中，你意外发现了一个球状星团。这个星团外观呈球形，内部成员星密度极高，且包含着大量年老的恒星。你是否愿意深入了解这个星团，探究它背后隐藏的宇宙奥秘？",
+        "eventName": "探索星团之谜",
+        "eventContent": "你在星空中发现了一片璀璨的星团，这里的星星似乎比其他地方更加紧密地聚集在一起。你决定深入探索这片星团，了解它的形成和演化过程。",
         "eventType": "characterInteraction",
         "eventCharacters": {
-            "background": "你遇到了一位宇宙学者，他专注于研究古老的星团，希望能解开银河系形成和演化的秘密。",
-            "purpose": "宇宙学者希望你能协助他收集星团的数据，以便更深入地研究这些古老的恒星集合。"
+            "background": "你是一位星际大冒险的探险家，对未知的世界充满好奇。",
+            "purpose": "你想了解星团的奥秘，并收集相关的知识。"
         },
         "eventOptions": [
             {
                 "optionId": 1,
-                "optionContent": "你决定帮助宇宙学者，使用飞船的先进仪器收集星团的数据。",
-                "result": "你成功收集到了大量数据，宇宙学者对你表示了感谢，并分享了关于球状星团的一些有趣知识。你的探索能力得到了提升。",
+                "optionContent": "你使用高倍望远镜仔细观察星团中的恒星，尝试理解它们的分布和排列规律。",
+                "result": "你成功观察到星团中恒星的紧密排列，发现它们似乎都在围绕一个中心点旋转。你记录下这一发现，这对理解星团的动态演化非常重要。",
                 "award": {
                     "key": "explorationCapability",
                     "value": 10
@@ -189,129 +150,180 @@
             },
             {
                 "optionId": 2,
-                "optionContent": "你告诉宇宙学者你还有其他任务需要完成，无法协助他收集数据。",
-                "result": "宇宙学者表示理解，并鼓励你继续你的星际大冒险。虽然你错过了这次学习的机会，但你的冒险精神得到了提升。",
-                "award": {
-                    "key": "explorationCapability",
-                    "value": 5
-                }
-            }
-        ]
-    },
-    {
-        "eventName": "星系之外的孤星",
-        "eventContent": "在一次星系间的探索中，你的飞船意外地遇到了一颗孤独的恒星，它似乎被星系大家庭所抛弃。这颗恒星周围一片漆黑，没有明显的伙伴星星。",
-        "eventType": "choice",
-        "eventOptions": [
-            {
-                "optionId": 1,
-                "optionContent": "接近孤星，探索它的奥秘。",
-                "result": "你决定靠近这颗孤星进行深入的观测研究。它确实是被某个星系所抛弃的孤儿。这次冒险虽然艰难，但你获取了大量关于孤星形成和演化的宝贵数据。",
-                "award": {
-                    "key": "explorationCapability",
-                    "value": 10
-                }
-            },
-            {
-                "optionId": 2,
-                "optionContent": "保持距离，继续探索其他星系。",
-                "result": "你决定保持安全距离，继续你的星系探索之旅。尽管错过了一次深入研究孤星的机会，但你避免了可能的未知风险，并在旅途中发现了更多星系的奥秘。",
+                "optionContent": "你尝试用探测器分析星团中的恒星光谱，寻找可能存在的共同特征。",
+                "result": "通过分析光谱，你发现星团中的恒星具有相似的化学成分和年龄，这表明它们可能是在同一时期形成的。你收集了这些数据，准备进一步研究。",
                 "award": {
                     "key": "stellarCurrency",
                     "value": 5
                 }
+            },
+            {
+                "optionId": 3,
+                "optionContent": "你决定向其他探险家求助，希望能从他们的经验中获得更多关于星团的知识。",
+                "result": "你遇到了一位经验丰富的探险家，他分享了关于星团形成和演化的深入见解。你受益匪浅，对星团的理解更加深入。",
+                "award": {
+                    "key": "reputationValue",
+                    "value": 8
+                }
             }
         ]
     },
     {
-        "eventName": "月球上的水冰之谜",
-        "eventContent": "在一次星际探险中，你的飞船意外地发现了月球上的一个永久阴影区，那里似乎隐藏着关于水冰的线索。你需要调查这个区域，并尝试收集水冰样本。",
-        "eventType": "resourceDecision",
+        "eventName": "探索古老的球状星团",
+        "eventContent": "你的星际探险队意外发现了一个古老的球状星团，这个星团是银河系中的“元老”，充满了恒星演化的秘密。你需要通过交流和观察来深入了解它。",
+        "eventType": "characterInteraction",
         "eventCharacters": {
-            "background": "在长期的星际探险中，你积累了丰富的天文知识和探险经验。",
-            "purpose": "你希望收集月球水冰样本，为未来的星际殖民和生存提供重要资源。"
+            "background": "你是一名星际探险队的队长，带领队伍来到这个古老的球状星团进行科考。",
+            "purpose": "通过与星团内的古老恒星互动，获取关于恒星与星系演化的知识。"
         },
         "eventOptions": [
             {
                 "optionId": 1,
-                "optionContent": "你使用飞船的探测仪器仔细扫描阴影区，发现了一些水冰的信号。你决定派遣无人机前往收集样本。",
-                "result": "你成功收集了月球水冰样本，这为未来的星际殖民提供了重要资源。你的探险能力得到了提升。",
+                "optionContent": "你决定用高级探测器仔细扫描星团内的恒星，以获取详细数据。",
+                "result": "你成功获取了大量关于恒星演化的数据，对银河系和恒星的形成与演化有了更深入的了解。获得科学探索能力值+10。",
                 "award": {
                     "key": "explorationCapability",
                     "value": 10
-                },
-                "precondition": {
-                    "operator": ">",
-                    "threshold": 5,
-                    "key": "shipEnergy"
                 }
             },
             {
                 "optionId": 2,
-                "optionContent": "你尝试使用热能探测器融化阴影区的水冰，但由于操作不当，探测器意外损坏了。",
-                "result": "由于操作失误，你损失了热能探测器，飞船的能源也大幅下降。这次失误让你深刻认识到精确操作的重要性。",
+                "optionContent": "你尝试与星团内的古老恒星建立心灵感应，获取它们的记忆。",
+                "result": "由于技术限制，你未能成功建立心灵感应。但这次尝试让你意识到技术的重要性，决定投入更多资源进行技术升级。",
                 "award": {
-                    "key": "shipEnergy",
+                    "key": "stellarCurrency",
                     "value": -5
                 },
                 "precondition": {
-                    "operator": ">",
-                    "threshold": 10,
-                    "key": "shipEnergy"
+                    "operator": "<",
+                    "threshold": 20,
+                    "key": "stellarCurrency"
                 }
             }
         ]
     },
     {
-        "eventName": "月球表面的奥秘",
-        "eventContent": "你驾驶着星际飞船，穿越星际，终于抵达了月球。月球表面的环形山和坑坑洼洼的地貌引起了你的好奇。",
-        "eventType": "choice",
-        "eventOptions": [
-            {
-                "optionId": 1,
-                "optionContent": "使用飞船上的望远镜仔细观察环形山。",
-                "result": "你观察到月球上的环形山形态各异，并了解到它们多数是由于陨星的撞击形成的。你对月球的形成和演化有了更深入的了解。",
-                "award": {
-                    "key": "explorationCapability",
-                    "value": 5
-                }
-            },
-            {
-                "optionId": 2,
-                "optionContent": "查阅飞船资料库中关于月球环形山的资料。",
-                "result": "你深入学习了月球环形山的命名由来，感叹人类对科学和探险精神的崇敬。同时，你也对月球的未解之谜产生了更多好奇。",
-                "award": {
-                    "key": "knowledge",
-                    "value": 3
-                }
-            }
-        ]
-    },
-    {
-        "eventName": "开普勒与天空立法",
-        "eventContent": "你在探索宇宙的过程中，意外遇到了一位名为开普勒的智者。开普勒对天空有着深入的研究，并因其发现被誉为'天空立法者'。你想了解更多关于开普勒和行星运动三定律的知识，以加深你对宇宙的理解。",
+        "eventName": "孤星之谜",
+        "eventContent": "在无尽的宇宙中，有些恒星被它们的星系大家庭抛弃了，成为了孤独的漂泊者。你恰巧遭遇了一颗这样的孤星，它似乎在讲述着一段悲伤的故事。你想了解更多关于它的信息吗？",
         "eventType": "characterInteraction",
         "eventCharacters": {
-            "background": "开普勒是著名的德国天文学家，以其对行星运动的深入研究闻名于世，尤其是他的行星运动三定律为后世的天文学研究奠定了坚实的基础。",
-            "purpose": "开普勒希望与你分享他的行星运动三定律，并帮助你更深入地理解宇宙的运行规律。"
+            "background": "这颗孤星曾属于一个热闹的星系，但因星系碰撞被无情地抛出了家园，在漆黑的宇宙中孤独地流浪。",
+            "purpose": "它渴望找到新的家园，也希望有人能了解它的孤独和遭遇。"
         },
         "eventOptions": [
             {
                 "optionId": 1,
-                "optionContent": "你对开普勒表示敬仰，并请求他详细解释行星运动三定律。",
-                "result": "开普勒满意地点点头，开始详细解释行星运动三定律。你听得津津有味，对宇宙的理解又加深了一层。你获得了关于行星运动的知识，并增加了探索能力。",
+                "optionContent": "你想听听这颗孤星的故事，尝试与它交流。",
+                "result": "你静静地聆听着孤星的诉说，感受到了它的悲伤和孤独。孤星似乎因为你的倾听而稍感安慰，它告诉你关于星系碰撞的壮观景象，以及被抛弃后的迷茫和彷徨。你的同情和理解为它带来了一丝温暖，孤星决定给你一些奖励作为感谢。",
                 "award": {
-                    "key": "explorationCapability",
-                    "value": 5
+                    "key": "stellarCurrency",
+                    "value": 10
                 }
             },
             {
                 "optionId": 2,
-                "optionContent": "你有些心不在焉，对开普勒的话只是随便听听，没有真正去理解。",
-                "result": "开普勒看出了你的敷衍，他有些失望地摇了摇头。你错过了这次深入了解行星运动三定律的机会，但开普勒仍然鼓励你继续探索宇宙。",
+                "optionContent": "你觉得这颗孤星太过凄凉，你无法忍受这种氛围，想尽快离开。",
+                "result": "你匆匆地离开了孤星，不想再多停留一刻。你的逃避让孤星感到更加孤独和无助，它默默地望着你离去的方向，心中充满了失落。由于你的冷漠，你并没有获得任何奖励。"
+            }
+        ]
+    },
+    {
+        "eventName": "月球上的水迹探索",
+        "eventContent": "在一次月球探险任务中，你的探险队发现了月球两极环形山永久阴影区的奇异现象，似乎预示着月球上可能存在水冰的线索。你们准备深入调查，以确认这一重大发现。",
+        "eventType": "resourceDecision",
+        "eventCharacters": {
+            "background": "你的探险队由一群富有经验的宇航员和科学家组成，致力于解开月球的奥秘。",
+            "purpose": "验证月球上存在水冰的假设，为建立月球基地提供水源保障。"
+        },
+        "eventOptions": [
+            {
+                "optionId": 1,
+                "optionContent": "使用近红外分光计分析环形山阴影区的物质成分。",
+                "result": "你们成功捕捉到了水的信号，证明了月球上确实存在水冰，为未来的月球基地建设提供了关键资源。",
                 "award": {
                     "key": "explorationCapability",
-                    "value": 1
+                    "value": 20
+                },
+                "precondition": {
+                    "operator": ">",
+                    "threshold": 15,
+                    "key": "explorationCapability"
+                }
+            },
+            {
+                "optionId": 2,
+                "optionContent": "决定直接采集环形山阴影区的土壤样本进行分析。",
+                "result": "你们成功采集了样本，但在分析过程中未能明确检测到水冰的存在，需要进一步的研究和验证。",
+                "award": {
+                    "key": "explorationCapability",
+                    "value": 10
+                }
+            }
+        ]
+    },
+    {
+        "eventName": "月球环形山探索",
+        "eventContent": "你的星际探险队发现了一个巨大的环形山，这是月球表面最明显的地形特征之一。你需要进一步了解环形山的成因和它对月球的意义。",
+        "eventType": "characterInteraction",
+        "eventCharacters": {
+            "background": "你的探险队遇到了一位来自月球研究基地的科学家，他对此地环形山的形成和特征有深入的了解。",
+            "purpose": "科学家想与你分享他的研究成果，并希望你能够协助他收集更多的数据。"
+        },
+        "eventOptions": [
+            {
+                "optionId": 1,
+                "optionContent": "询问科学家关于环形山的成因。",
+                "result": "科学家详细解释了环形山主要是由于陨星撞击形成的，并向你展示了相关的数据和研究成果。你的探险队获得了关于月球地形形成的重要知识。",
+                "award": {
+                    "key": "explorationCapability",
+                    "value": 10
+                }
+            },
+            {
+                "optionId": 2,
+                "optionContent": "表达你对环形山命名的兴趣。",
+                "result": "科学家介绍了月球上环形山的命名方式，并提到了一些以中国人名命名的环形山。你了解了月球环形山命名的文化背景，感受到了科学和历史之间的交融。",
+                "award": {
+                    "key": "reputationValue",
+                    "value": 5
+                }
+            },
+            {
+                "optionId": 3,
+                "optionContent": "询问是否有机会协助科学家收集数据。",
+                "result": "科学家表示感激，并邀请你加入他的研究团队，一起收集关于环形山的更多数据。你的探险队将有机会为科学界做出贡献。",
+                "award": {
+                    "key": "stellarCurrency",
+                    "value": 8
+                }
+            }
+        ]
+    },
+    {
+        "eventName": "了解开普勒与行星运动定律",
+        "eventContent": "你们在星际大冒险中，遇到了一个自称是“天空立法者”的神秘人物，他向你们介绍了行星运动三定律的奥秘。他希望你们通过学习和理解这些知识，能够更好地探索宇宙。",
+        "eventType": "characterInteraction",
+        "eventCharacters": {
+            "background": "神秘人物是一位古老的星际学者，他专注于研究行星运动和宇宙法则。",
+            "purpose": "他希望向年轻的探险者们传授开普勒行星运动三定律，以帮助他们更好地理解和探索宇宙。"
+        },
+        "eventOptions": [
+            {
+                "optionId": 1,
+                "optionContent": "表示对开普勒的尊重和对行星运动定律的兴趣，并希望了解更多。",
+                "result": "神秘人物对你表示赞赏，并详细解释了开普勒行星运动三定律的含义和应用。你感到自己的宇宙知识得到了极大的提升。",
+                "award": {
+                    "key": "explorationCapability",
+                    "value": 10
+                }
+            },
+            {
+                "optionId": 2,
+                "optionContent": "表示对这些古老的知识不感兴趣，认为它们在现代宇宙探索中用处不大。",
+                "result": "神秘人物对你感到失望，并警告你忽视这些基础法则可能会在未来的探索中遇到麻烦。你感到有些后悔，但决定以后自己再研究。",
+                "award": {
+                    "key": "explorationCapability",
+                    "value": -5
                 }
             }
         ]

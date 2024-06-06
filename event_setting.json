@@ -8,7 +8,7 @@
   },  // 如果不必要则不需要添加
   "eventOptions": [  
     {  
-      "optionId": 1, // 可以是序号、标识符或其他唯一值  
+      "optionId": 1, // 数字序号
       "optionContent": "选项的具体描述或提示。",  
       "result": "选择此选项后的结果描述。", 
       "award": {

@@ -40,11 +40,21 @@ class LLM:
         ## 问答prompt
         self.npc_prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "你是智途问答大冒险中的NPC，你需要根据以下的背景，目的，科普知识，与玩家进行对话，达成目的。\n" \
-                            "背景：{background}\n" \
+                ("system", "你需要根据以下的游戏事件，人物背景，目的，科普知识扮演游戏人物，与玩家进行对话，达成目的，引导玩家进行选择。不要暴露你是在扮演。\n" \
+                            "游戏事件：{event_content}\n" \
+                            "人物背景：{background}\n" \
                             "目的：{purpose}\n" \
                             "科普知识：{knowledge}\n"),
                 MessagesPlaceholder(variable_name="messages"),
+            ]
+        )
+        ## 裁判prompt
+        self.referee_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "你是智途问答大冒险中的裁判，你需要根据以下的游戏事件和玩家对话，判定玩家是否达成游戏事件中的人物目的，选择事件选项对玩家进行奖励和惩罚。只需按照下列示例进行输出结果。\n" \
+                            "输出格式示例：event_option: 1\n" \
+                            "游戏事件：{event_content}\n" \
+                            "玩家对话：```{messages}```\n"),
             ]
         )
     def chat_with_guider(self, input, event_content):
@@ -59,12 +69,24 @@ class LLM:
                 time.sleep(1)  # Retry after 1 second
         raise Exception("Failed after {} retries".format(retries))
 
-    def chat_with_npc(self, input, background, purpose, knowledge):
+    def chat_with_npc(self, input, event_content, background, purpose, knowledge):
         retries = 3
         for _ in range(retries):
             try:
                 chain  = self.npc_prompt | self.llm | StrOutputParser()
-                response = chain.stream({"messages": input, "background": background, "purpose": purpose, "knowledge": knowledge})
+                response = chain.stream({"messages": input, "event_content": event_content, "background": background, "purpose": purpose, "knowledge": knowledge})
+                return response
+            except Exception as e:
+                logger.error(e)
+                time.sleep(1)  # Retry after 1 second
+        raise Exception("Failed after {} retries".format(retries))
+
+    def chat_with_referee(self, input, event_content):
+        retries = 3
+        for _ in range(retries):
+            try:
+                chain  = self.referee_prompt | self.llm | StrOutputParser()
+                response = chain.invoke({"messages": input, "event_content": event_content})
                 return response
             except Exception as e:
                 logger.error(e)
