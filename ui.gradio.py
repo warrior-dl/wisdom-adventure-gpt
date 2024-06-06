@@ -18,39 +18,55 @@ def format_history(history, message):
     history_langchain_format.append(HumanMessage(content=message))
     return history_langchain_format
 
+def submit_choice_event(session, option, history):
+    if option == []:
+        return None
+    logger.info("player options: {}".format(option))
+    try:
+        ## 取出option中: 前的数字id
+        optionId = option.split(":")[0]
+        # 转为int
+        optionId = int(optionId)
+    except:
+        optionId = None
+        logger.error("optionId is not int: {}".format(optionId))
+
+    return get_event_result(session, optionId)
+
+def get_event_result(session, optionId):
+    if optionId is None:
+        return None
+    try:
+        logger.info("optionId: {}", optionId)
+        controller.update_resource(session, optionId)
+        return controller.get_event_option(session, optionId)["result"]
+    except:
+        logger.error("get_event_option failed: {}", optionId)
+        return None
+
+def submit_characterInteraction_event(session, option, history):
+    langchain_format = format_history(history, "")
+    try:
+        optionId = controller.referee_judge(session, langchain_format)
+    except:
+        logger.error("referee failed")
+        optionId = None
+    return get_event_result(session, optionId)
+
 def submit(session, option, history):
     logger.info("session: {}, option: {}".format(session, option))
     event = controller.get_event(session)
-    if event is not None and event.get_type() == "characterInteraction":
-        langchain_format = format_history(history, "")
-        try:
-            optionId = controller.referee_judge(session, langchain_format)
-        except:
-            logger.error("referee failed")
-            optionId = None
-    else:
-        if option == []:
-            return None, display_status(session)
-        logger.info("player options: {}".format(option))
-        try:
-            ## 取出option中: 前的数字id
-            optionId = option.split(":")[0]
-            # 转为int
-            optionId = int(optionId)
-        except:
-            optionId = None
-            logger.error("optionId is not int: {}".format(optionId))
-    if optionId is None:
+    if event is None:
         return None, display_status(session)
-
-    try:
-        logger.info("optionId: {}".format(optionId))
-        controller.update_resource(session, optionId)
-        result = controller.get_event_option(session, optionId)["result"]
-    except:
-        result = None
-        logger.error("get_event_option failed: {}", optionId)
-
+    event_type = event.get_type()
+    ## 根据事件类型进行分类处理
+    match event_type:
+        case "choice":
+            result = submit_choice_event(session, option, history)
+        case "characterInteraction":
+            result = submit_characterInteraction_event(session, option, history)
+        case _:
+            result = None
     return result, display_status(session)
 
 
@@ -174,6 +190,7 @@ if __name__ == '__main__':
         with gr.Column():
             intro = gr.Markdown(value=introduce())
             resource = gr.Markdown(label="游戏资源", value=display_status())
+            # TODO: 出发和提交按钮合并
             start_button = gr.Button("出发")
             event = gr.Textbox(label="事件内容")
             event_content_tts = gr.HTML()

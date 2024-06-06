@@ -44,7 +44,7 @@ class PlayerStatus:
         return self.history
     def get_resource(self):
         return self.resource
-    def update_resource(self, key, value):
+    def update_resource(self, awards):
         if self.current_event.used:
             logger.info("had update status, not need update again")
             return
@@ -52,9 +52,13 @@ class PlayerStatus:
         if event is None:
             logger.info("current event is None")
             return
-        if key is not None:
-            logger.info(f"status update: key: {key}, value: {value}")
-            self.resource.update(key, value)
+        for i in awards:
+            key, value = i["key"], i["value"]
+            if key is not None:
+                logger.info(f"award: key: {key}, value: {value}")
+                new_value = self.resource.get_value(key) + value
+                logger.info(f"status update: key: {key}, new_value: {new_value}")
+                self.resource.update(key, new_value)
         self.current_event.used = True
 
 class StatusManager:

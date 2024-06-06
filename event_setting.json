@@ -1,25 +1,20 @@
 {  
   "eventName": "遭遇事件名称",  
   "eventContent": "这里是关于遭遇事件的详细描述。",  
-  "eventType": "characterInteraction|choice|resourceDecision", // characterInteraction:人物交流 choice:选择 resourceDecision:资源判定
+  "eventType": "characterInteraction|choice|battle", // characterInteraction:人物交流 choice:选择 battle:战斗
   "eventCharacters": {  
-    "background": "事件人物的背景信息。",  
-    "purpose": "事件人物的目的或动机。"  
+    "background": "事件NPC人物背景信息。",  
+    "purpose": "事件NPC人物的目的或动机。"  
   },  // 如果不必要则不需要添加
   "eventOptions": [  
     {  
       "optionId": 1, // 数字序号
       "optionContent": "选项的具体描述或提示。",  
       "result": "选择此选项后的结果描述。", 
-      "award": {
+      "award": [{
         "key": "stellarCurrency|shipEnergy|explorationCapability|reputationValue",
         "value": 5 // 惩罚则为负数
-      },
-      "precondition": {  
-        "operator": "<|>",  
-        "threshold": 20,  
-        "key": "stellarCurrency|shipEnergy|explorationCapability|reputationValue"  
-      }    //需要满足的条件才能选择此选项
+      }]
     },  
     {  
       "optionId": 2,  
@@ -27,5 +22,5 @@
       "result": "选择此选项后的结果描述。"  
       // ...  
     }
-  ]  // eventType不是choice的只有一个选项
+  ]
 }

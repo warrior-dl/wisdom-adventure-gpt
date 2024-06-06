@@ -18,10 +18,10 @@ class Event:
         self.used = False
     def get_id(self):
         return self.id
-    def get_award(self, id) -> tuple:
+    def get_award(self, id) -> list:
         for option in self.content["eventOptions"]:
             if option["optionId"] == id:
-                return option["award"]["key"], option["award"]["value"]
+                return option["award"]
         return None
     def get_type(self):
         return self.content["eventType"]

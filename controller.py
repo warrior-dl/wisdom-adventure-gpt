@@ -35,18 +35,19 @@ class Controller:
         status = self.status_manager.get_status_with_session(session)
         return status.get_resource()
 
-    def update_resource(self, session, optionId):
+    def update_resource(self, session:str, optionId:int):
         status = self.status_manager.get_status_with_session(session)
         cur_event = status.get_cur_event()
         if cur_event is None:
             logger.warning("current event is None")
             return
-        key, value = cur_event.get_award(optionId)
-        if key is not None:
-            logger.info(f"award: key: {key}, value: {value}")
-            status.update_resource(key, status.resource.get_value(key) + value)
+        awards = cur_event.get_award(optionId)
+        if awards is None:
+            logger.warning("award is None")
+            return
+        status.update_resource(awards)
 
-    def get_event_option(self, session, optionId):
+    def get_event_option(self, session, optionId:int):
         status = self.status_manager.get_status_with_session(session)
         event = status.get_cur_event()
         if event is None:
