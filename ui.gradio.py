@@ -302,13 +302,14 @@ if __name__ == '__main__':
             battle = gr.Markdown(label="战斗状态", value=display_battle_status())
             # TODO: 出发和提交按钮合并
             # start_button = gr.Button("出发")
-            continue_button = gr.Button("行动")
             event = gr.Textbox(label="事件内容")
             event_content_tts = gr.HTML()
             options = gr.Radio(label="选项", choices=[])
             # submit_button = gr.Button("提交")
             result = gr.Textbox(label="事件结果")
+            continue_button = gr.Button("行动")
             # event_result_tts = gr.HTML()
+            chatbot = gr.Chatbot()
             input_audio = gr.Audio(
                 sources=["microphone"],
                 waveform_options=gr.WaveformOptions(
@@ -320,7 +321,6 @@ if __name__ == '__main__':
                 type="filepath",
             )
             tts_text = gr.Textbox(label="语音", visible=False)
-            chatbot = gr.Chatbot()
             msg = gr.Textbox()
             msg.submit(bot, [session, msg, chatbot], [msg, chatbot]).then(bot_speech, [chatbot], [event_content_tts])
             # submit_button.click(submit,[session, options, chatbot],[result, resource]).then(display_battle_status, [session], [battle]).then(event_speech, [result], [event_content_tts])
