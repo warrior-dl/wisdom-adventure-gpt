@@ -22,10 +22,9 @@ async def main():
         event_setting = f.read()
     system_message = SystemMessage(content="你是一个星际大冒险知识科普游戏的事件设计师，你需要根据以下的科普问答知识来制作一个游戏事件。"
                                    "事件需要以科普知识为主要目的，作为激发儿童好奇心的引子。"
-                                   "有三种事件类型：人物交流characterInteraction, 选择choice和战斗事件battle。"
-                                   "人物交流characterInteraction：需要和玩家以外的NPC对话交流，完成NPC的目的，在eventOptions给出交涉成功和失败的选项；"
+                                   "有三种事件类型：人物交流characterInteraction, 选择choice。"
+                                   "人物交流characterInteraction：需要和玩家以外的事件人物对话交流，完成事件人物的目的，在eventOptions给出交涉成功和失败的选项，选项需表现出玩家与人物交流的态度，尽量不涉及具体事件内容；"
                                    "选择choice：需要给出eventOptions选项供玩家选择；"
-                                   "战斗事件battle：事件人物需要与玩家进行战斗，在eventOptions给出战斗的选项。"
                                    "你需要直接输出以下json格式的事件：" + event_setting
                                    )
     model = ERNIEBot(model="ernie-3.5", system=system_message.content)

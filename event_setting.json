@@ -3,8 +3,9 @@
   "eventContent": "这里是关于遭遇事件的详细描述。",  
   "eventType": "characterInteraction|choice|battle", // characterInteraction:人物交流 choice:选择 battle:战斗
   "eventCharacters": {  
-    "background": "事件NPC人物背景信息。",  
-    "purpose": "事件NPC人物的目的或动机。"  
+    "background": "玩家以外的事件人物背景信息。",  
+    "purpose": "玩家以外的事件人物的目的或动机。",
+    "selfIntroduction": "事件人物对玩家打招呼以及自我介绍。"
   },  // 如果不必要则不需要添加
   "eventOptions": [  
     {  

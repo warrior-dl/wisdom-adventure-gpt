@@ -1,5 +1,5 @@
 import re
-from status import PlayerStatus, StatusManager
+from status import PlayerStatus, StatusManager, BattleResult, GameStatus
 from event import EventManager
 from voice import Voice
 from loguru import logger
@@ -8,21 +8,32 @@ class Controller:
 
     def __init__(self):
         self.status_manager = StatusManager()
-        self.event_manager = EventManager("data/event_list.json", "data/data.json")
+        self.event_manager = EventManager("data/event_list.json", "data/data.json", "data/battle.json")
         self.llm = LLM()
         self.voice = Voice()
-    def get_event(self, session=None):
+    def get_event(self, session):
         if session is None:
-            logger.error("session is None")
+            logger.warning("session is None")
             return None
         status = self.status_manager.get_status_with_session(session) 
         return status.get_cur_event()
     def update_event(self, session) :
         status = self.status_manager.get_status_with_session(session)
+        game_time = status.get_game_time()
+        if game_time % 5 == 0 and game_time != 0:
+            index, event = self.event_manager.get_battle_by_index(0)
+            status.set_cur_event(event)
+            status.add_game_time()
+            enemy_info = event.get_enemy_info()
+            enemy_hp = enemy_info["hp"]
+            enemy_attack = enemy_info["attack"]
+            status.set_battle_status(player_hp=100, enemy_hp=enemy_hp, enemy_attack=enemy_attack)
+            return True
         while True:
             index, event = self.event_manager.get_event_random()
             if not status.is_in_history(index):
                 status.set_cur_event(event)
+                status.add_game_time()
                 status.add_history(index)
                 return True
             elif len(status.get_history()) == len(self.event_manager.event_list):
@@ -30,7 +41,12 @@ class Controller:
                 # TODO: 结算
                 self.current_event = None
                 return False
-            
+    def get_game_status(self, session=None):
+        status = self.status_manager.get_status_with_session(session)
+        return status.get_game_status()
+    def set_game_status(self, session, status: GameStatus):
+        pys = self.status_manager.get_status_with_session(session)
+        pys.set_game_status(status)
     def get_resource(self, session=None):
         status = self.status_manager.get_status_with_session(session)
         return status.get_resource()
@@ -41,7 +57,7 @@ class Controller:
         if cur_event is None:
             logger.warning("current event is None")
             return
-        awards = cur_event.get_award(optionId)
+        awards = cur_event.get_option_award(optionId)
         if awards is None:
             logger.warning("award is None")
             return
@@ -108,5 +124,46 @@ class Controller:
     
     def get_asr(self, audio):
         return self.voice.get_asr(audio)
+    def get_battle_status(self, session):
+        status = self.status_manager.get_status_with_session(session)
+        return status.get_battle_status()
+
+    def format_awards(self, awards):
+        msg = ""
+        for award in awards:
+            if award["key"] == "stellarCurrency":
+                msg = msg + "获得{}星币!\n".format(award["value"])
+            if award["key"] == "shipEnergy":
+                msg = msg + "获得{}能量!\n".format(award["value"])
+            if award["key"] == "reputationValue":
+                msg = msg + "获得{}声望!\n".format(award["value"])
+        return msg
+    def update_battle_status(self, session, optionId):
+        status = self.status_manager.get_status_with_session(session)
+        cur_event = status.get_cur_event()
+        if cur_event is None:
+            logger.warning("current event is None")
+            return
+        awards = cur_event.get_option_award(optionId)
+        if awards is None:
+            logger.warning("award is None")
+            return
+        battle_result, msg = status.update_battle_status(awards)
+        match battle_result:
+            case BattleResult.PLAYER_WIN:
+                awards = cur_event.get_event_award()
+                status.update_resource(awards)
+                # 格式化奖励
+                msg = msg + "\n" + self.format_awards(awards)
+                return battle_result, msg
+            case BattleResult.RESOURCE_NOT_ENOUGH:
+                logger.warning("battle_result: {}, msg: {}", battle_result, msg)
+                return battle_result, msg
+            case BattleResult.ENEMY_WIN:
+                logger.warning("battle_result: {}, msg: {}", battle_result, msg)
+                return battle_result, msg
+            case BattleResult.NOT_FINISHED:
+                logger.warning("battle_result: {}, msg: {}", battle_result, msg)
+                return battle_result, self.get_event_option(session, optionId)["result"] + "\n" + msg
 
     

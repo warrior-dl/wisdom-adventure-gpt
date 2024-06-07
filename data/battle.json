@@ -1,0 +1,79 @@
+[{
+    "eventName": "战斗",
+    "eventContent": "你遇到了一个星际海盗团，你需要击败他们。",
+    "eventType": "battle",
+    "eventCharacters": {
+        "background": "",
+        "purpose": ""
+    },
+    "enemyInfo": {
+        "hp": 100,
+        "attack": 10
+    },
+    "eventAward": [
+    {
+        "key":"stellarCurrency",
+        "value": 100
+    },
+    {
+        "key": "shipEnergy",
+        "value": 50
+    },
+    {
+        "key": "reputationValue",
+        "value": 5
+    }],
+    "eventOptions": [
+        {
+            "optionId": 1,
+            "optionContent": "正面攻击",
+            "result": "攻击成功",
+            "award": [{
+                "key": "enemy_hp",
+                "value": "explorationCapability"
+            },
+            {
+                "key": "shipEnergy",
+                "value": -5
+            }]
+        },
+        {
+            "optionId": 2,
+            "optionContent": "消耗5点声誉，呼叫增援",
+            "result": "敌人血量减少100",
+            "award": [{
+                "key": "reputationValue",
+                "value": -5
+            },
+            {   "key": "enemy_hp",
+                "value": 100
+            }]
+        },
+        {
+            "optionId": 3,
+            "optionContent": "花费30个货币修复飞船",
+            "result": "飞船血量恢复30",
+            "award": [{
+                "key": "player_hp",
+                "value": 30
+            },
+            {
+                "key": "stellarCurrency",
+                "value": -30
+            }]
+        },
+        {
+            "optionId": 4,
+            "optionContent": "花费30个货币补给能量",
+            "result": "能量恢复30",
+            "award": [{
+                "key": "shipEnergy",
+                "value": 30
+            },
+            {
+                "key": "stellarCurrency",
+                "value": -30
+            }]
+        }
+    ]
+}]

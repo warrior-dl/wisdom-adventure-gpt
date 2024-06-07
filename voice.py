@@ -16,7 +16,11 @@ class Voice:
 
     def get_tts(self, text):
         inp = appbuilder.Message(content={"text": text})
-        out = self.tts.run(message=inp, person=4)
+        try:
+            out = self.tts.run(message=inp, person=4)
+        except Exception as e:
+            logger.error("tts error: {}", e)
+            return None
         return out.content["audio_binary"]
     
     def get_asr(self, audio):
