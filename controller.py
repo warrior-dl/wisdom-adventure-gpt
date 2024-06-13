@@ -1,4 +1,5 @@
 import re
+import json
 from status import PlayerStatus, StatusManager, BattleResult, GameStatus
 from event import EventManager
 from voice import Voice
@@ -86,6 +87,10 @@ class Controller:
         output = self.llm.chat_with_referee(input, event_content)
         logger.info("referee: {}", output)
         return output
+    def chat_with_question(self, input, event_content):
+        output = self.llm.chat_with_question(input, event_content)
+        logger.info("question: {}", output)
+        return output
     def chat(self, input, session = None):
         event_content = ""
         if session is not None:
@@ -118,6 +123,22 @@ class Controller:
         except:
             logger.warning("referee failed, str_out: {}", str_out)
             raise Exception("referee failed, str_out: {}".format(str_out))
+        
+    def create_question(self, session, input):
+        status = self.status_manager.get_status_with_session(session)
+        event = status.get_cur_event()
+        if event is None:
+            logger.warning("current event is None")
+            raise Exception("current event is None")
+        event_content = event.get_content()
+        str_out =  self.chat_with_question(input, event_content)
+        try:
+            content = str_out.replace("```json", "").replace("```", "")
+            ## json序列化
+            return json.loads(content)
+        except:
+            logger.warning("json failed, str_out: {}", content)
+            raise Exception("json failed, str_out: {}".format(content))
 
     def get_tts(self, text):
         return self.voice.get_tts(text)

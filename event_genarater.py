@@ -21,8 +21,8 @@ async def main():
     with open('event_setting.json', 'r', encoding='utf-8') as f:
         event_setting = f.read()
     system_message = SystemMessage(content="你是一个星际大冒险知识科普游戏的事件设计师，你需要根据以下的科普问答知识来制作一个游戏事件。"
-                                   "事件需要以科普知识为主要目的，作为激发儿童好奇心的引子。"
-                                   "有三种事件类型：人物交流characterInteraction, 选择choice。"
+                                   "事件需要以科普知识为主要目的，作为激发儿童好奇心的引子，但是不要生硬的直接以科普为目的，而是应该在玩家推进事件的过程中激发儿童好奇。"
+                                   "有两种事件类型：人物交流characterInteraction, 选择choice。"
                                    "人物交流characterInteraction：需要和玩家以外的事件人物对话交流，完成事件人物的目的，在eventOptions给出交涉成功和失败的选项，选项需表现出玩家与人物交流的态度，尽量不涉及具体事件内容；"
                                    "选择choice：需要给出eventOptions选项供玩家选择；"
                                    "你需要直接输出以下json格式的事件：" + event_setting

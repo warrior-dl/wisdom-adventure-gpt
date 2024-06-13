@@ -57,6 +57,17 @@ class LLM:
                             "玩家对话：```{messages}```\n"),
             ]
         )
+        example = '''["问题1", "问题2", "问题3"]'''
+        
+        ## 问题推荐
+        self.question_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "你需要根据以下的游戏事件和玩家对话，推荐三个科普知识问题或者选项供玩家进行选择。使用json格式输出结果。\n" \
+                            "输出格式示例：" + example + "\n" \
+                            "游戏事件：{event_content}\n" \
+                            "玩家对话：```{messages}```\n"),
+            ]
+        )
     def chat_with_guider(self, input, event_content):
         retries = 3
         for _ in range(retries):
@@ -86,6 +97,18 @@ class LLM:
         for _ in range(retries):
             try:
                 chain  = self.referee_prompt | self.llm | StrOutputParser()
+                response = chain.invoke({"messages": input, "event_content": event_content})
+                return response
+            except Exception as e:
+                logger.error(e)
+                time.sleep(1)  # Retry after 1 second
+        raise Exception("Failed after {} retries".format(retries))
+
+    def chat_with_question(self, input, event_content):
+        retries = 3
+        for _ in range(retries):
+            try:
+                chain  = self.question_prompt | self.llm | StrOutputParser()
                 response = chain.invoke({"messages": input, "event_content": event_content})
                 return response
             except Exception as e:

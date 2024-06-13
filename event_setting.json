@@ -1,7 +1,7 @@
 {  
   "eventName": "遭遇事件名称",  
   "eventContent": "这里是关于遭遇事件的详细描述。",  
-  "eventType": "characterInteraction|choice|battle", // characterInteraction:人物交流 choice:选择 battle:战斗
+  "eventType": "characterInteraction|choice", // characterInteraction:人物交流 choice:选择
   "eventCharacters": {  
     "background": "玩家以外的事件人物背景信息。",  
     "purpose": "玩家以外的事件人物的目的或动机。",
@@ -11,7 +11,7 @@
     {  
       "optionId": 1, // 数字序号
       "optionContent": "选项的具体描述或提示。",  
-      "result": "选择此选项后的结果描述。", 
+      "result": "选择此选项后的结果描述，需要以旁白的形式进行客观描述", 
       "award": [{
         "key": "stellarCurrency|shipEnergy|explorationCapability|reputationValue",
         "value": 5 // 惩罚则为负数

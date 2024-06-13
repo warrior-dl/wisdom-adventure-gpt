@@ -193,6 +193,19 @@ def bot(session, message, history):
         time.sleep(0.05)
         yield "", history
 
+# 问题推荐
+def create_question(session, history):
+    if history == []:
+        return []
+    langchain_format = format_history(history, "")
+    try:
+        result = controller.create_question(session, langchain_format)
+        logger.info("create question result: {}", result)
+    except:
+        logger.error("create question failed")
+        return []
+    return gr.Radio(result, label="问题推荐", interactive=True)
+
 def add_text(history, text, chatbot):
     history = history + [(text, None)]
     return history, ""
@@ -326,13 +339,15 @@ if __name__ == '__main__':
                 type="filepath",
             )
             tts_text = gr.Textbox(label="语音", visible=False)
+            qustion_options = gr.Radio(label="问题推荐", choices=[])
             msg = gr.Textbox()
-            msg.submit(bot, [session, msg, chatbot], [msg, chatbot]).then(bot_speech, [chatbot], [event_content_tts])
-            continue_button.click(coutinue,[session, event, options, gallery, chatbot, chatbot_history],[event, options, gallery, chatbot, chatbot_history, result, tts_text]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(event_speech, [tts_text], [event_content_tts])
-            options.input(coutinue,[session, event, options, gallery, chatbot, chatbot_history],[event, options, gallery, chatbot, chatbot_history, result, tts_text]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(event_speech, [tts_text], [event_content_tts])
+            msg.submit(bot, [session, msg, chatbot], [msg, chatbot]).then(bot_speech, [chatbot], [event_content_tts]).then(create_question, [session, chatbot], [qustion_options])
+            continue_button.click(coutinue,[session, event, options, gallery, chatbot, chatbot_history],[event, options, gallery, chatbot, chatbot_history, result, tts_text]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(event_speech, [tts_text], [event_content_tts]).then(create_question, [session, chatbot], [qustion_options])
+            options.input(coutinue,[session, event, options, gallery, chatbot, chatbot_history],[event, options, gallery, chatbot, chatbot_history, result, tts_text]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(event_speech, [tts_text], [event_content_tts]).then(create_question, [session, chatbot], [qustion_options])
             audio_text = gr.Textbox(visible=False)
             input_audio.stop_recording(asr_audio, [input_audio], [input_audio, audio_text]).then(
                 bot, [session, audio_text, chatbot], [audio_text, chatbot]).then(
-                    bot_speech, [chatbot], [event_content_tts])
-
+                    bot_speech, [chatbot], [event_content_tts]).then(create_question, [session, chatbot], [qustion_options])
+            qustion_options.input(bot, [session, qustion_options, chatbot], [qustion_options, chatbot]).then(
+                    bot_speech, [chatbot], [event_content_tts]).then(create_question, [session, chatbot], [qustion_options])
     demo.queue().launch(server_name="0.0.0.0")
