@@ -22,3 +22,4 @@ Agent RAG检索
 背景音乐
 chattts替换
 语音开关
+语音并行生成

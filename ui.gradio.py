@@ -32,9 +32,9 @@ def submit_choice_event(session, option):
         optionId = None
         logger.error("optionId is not int: {}".format(optionId))
 
-    return get_event_result(session, optionId)
+    return settle_event_result(session, optionId)
 
-def get_event_result(session, optionId):
+def settle_event_result(session, optionId):
     if optionId is None:
         return None
     try:
@@ -66,11 +66,11 @@ def get_battle_result(session, optionId):
 def submit_characterInteraction_event(session, history):
     langchain_format = format_history(history, "")
     try:
-        optionId = controller.referee_judge(session, langchain_format)
+        optionId, result = controller.referee_judge(session, langchain_format)
+        settle_event_result(session, optionId)
     except:
         logger.error("referee failed")
         return "你道别后重新出发，未收获特别的资源"
-    result = get_event_result(session, optionId)
     if  result is None:
         return "你道别后重新出发，未收获特别的资源"
     return result

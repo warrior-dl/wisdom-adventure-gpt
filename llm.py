@@ -48,22 +48,23 @@ class LLM:
                 MessagesPlaceholder(variable_name="messages"),
             ]
         )
+        referee_example = '''{{"event_option": 1, "result": "旁白对事件结果进行客观描述"}}'''
         ## 裁判prompt
         self.referee_prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "你是智途问答大冒险中的裁判，你需要根据以下的游戏事件和玩家对话，判定玩家是否达成游戏事件中的人物目的，选择事件选项对玩家进行奖励和惩罚。必须选择一项。只需按照下列示例进行输出结果。\n" \
-                            "输出格式示例：event_option: 1\n" \
+                ("system", "你是智途问答大冒险中的裁判，你需要根据以下的游戏事件和玩家对话，判定玩家是否达成游戏事件中的人物目的，选择事件选项对玩家进行奖励和惩罚，并根据对话重新生成选中选项的result。必须选择一项。只需按照下列示例进行输出json格式结果。\n" \
+                            "输出格式示例：" + referee_example + "\n" \
                             "游戏事件：{event_content}\n" \
                             "玩家对话：```{messages}```\n"),
             ]
         )
-        example = '''["问题1", "问题2", "问题3"]'''
+        question_example = '''["问题1", "问题2", "问题3"]'''
         
         ## 问题推荐
         self.question_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", "你需要根据以下的游戏事件和玩家对话，推荐三个科普知识问题或者选项供玩家进行选择。使用json格式输出结果。\n" \
-                            "输出格式示例：" + example + "\n" \
+                            "输出格式示例：" + question_example + "\n" \
                             "游戏事件：{event_content}\n" \
                             "玩家对话：```{messages}```\n"),
             ]

@@ -116,10 +116,10 @@ class Controller:
         event_content = event.get_content()
         str_out =  self.chat_with_referee(input, event_content)
         try:
-            ## str的格式：event_option: 1 xxxxxx，使用正则取出数字1，去除空格换行
-            search = re.search(r'event_option:\s*(\d+)', str_out)
-            logger.info("search.group(1): {}", search.group(1))
-            return int(search.group(1))
+            content = str_out.replace("```json", "").replace("```", "")
+            res = json.loads(content)
+            logger.info(" res: {}", res)
+            return int(res["event_option"]), res["result"]
         except:
             logger.warning("referee failed, str_out: {}", str_out)
             raise Exception("referee failed, str_out: {}".format(str_out))
