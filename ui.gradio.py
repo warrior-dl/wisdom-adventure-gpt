@@ -229,6 +229,10 @@ def generate_session_id() -> str:
     logger.info("session")
     return str(uuid.uuid4())
 
+def display_gallery(session=None) -> str:
+    logger.info("session: {}", session)
+    return controller.get_gallery(session)
+
 def event_speech(text):
     logger.info("event_speech: {}", text)
     if text == "" or text is None:
@@ -266,7 +270,7 @@ def asr_audio(audio):
     logger.info("asr: {}", asr["result"])
     return None, asr["result"][0]
 
-def coutinue(session, event_content, option, chatbot, chatbot_history):
+def coutinue(session, event_content, option, gallery, chatbot, chatbot_history):
     game_status = controller.get_game_status(session)
     event_result = ""
     tts_text = ""
@@ -274,6 +278,7 @@ def coutinue(session, event_content, option, chatbot, chatbot_history):
     match game_status:
         case GameStatus.NOT_START:
             event_content, radio, chatbot, chatbot_history, tts_text = start(session, chatbot, chatbot_history)
+            gallery = display_gallery(session)
             controller.set_game_status(session, GameStatus.EVENT_GOING)
         case GameStatus.EVENT_GOING:
             event_result, next_game_status = submit(session, option, chatbot)
@@ -287,10 +292,11 @@ def coutinue(session, event_content, option, chatbot, chatbot_history):
         case GameStatus.EVENT_END:
             event_content, radio, chatbot, chatbot_history, tts_text = start(session, chatbot, chatbot_history)
             event_result = ""
+            gallery = display_gallery(session)
             controller.set_game_status(session, GameStatus.EVENT_GOING)
         case GameStatus.GAME_OVER:
             pass
-    return event_content, radio, chatbot, chatbot_history, event_result, tts_text
+    return event_content, radio, gallery, chatbot, chatbot_history, event_result, tts_text
 
 if __name__ == '__main__':
     with gr.Blocks(title='wisdom-adventure', theme=gr.themes.Soft()) as demo:
@@ -300,15 +306,14 @@ if __name__ == '__main__':
             intro = gr.Markdown(value=introduce())
             resource = gr.Markdown(label="游戏资源", value=display_status())
             battle = gr.Markdown(label="战斗状态", value=display_battle_status())
-            # TODO: 出发和提交按钮合并
-            # start_button = gr.Button("出发")
             event = gr.Textbox(label="事件内容")
             event_content_tts = gr.HTML()
             options = gr.Radio(label="选项", choices=[])
-            # submit_button = gr.Button("提交")
             result = gr.Textbox(label="事件结果")
             continue_button = gr.Button("行动")
-            # event_result_tts = gr.HTML()
+            gallery = gr.Gallery(
+                label="images", show_label=False, elem_id="gallery"
+                , columns=[3], rows=[1], object_fit="contain", height="auto", interactive=False)
             chatbot = gr.Chatbot()
             input_audio = gr.Audio(
                 sources=["microphone"],
@@ -323,10 +328,8 @@ if __name__ == '__main__':
             tts_text = gr.Textbox(label="语音", visible=False)
             msg = gr.Textbox()
             msg.submit(bot, [session, msg, chatbot], [msg, chatbot]).then(bot_speech, [chatbot], [event_content_tts])
-            # submit_button.click(submit,[session, options, chatbot],[result, resource]).then(display_battle_status, [session], [battle]).then(event_speech, [result], [event_content_tts])
-            # start_button.click(start,[session, chatbot, chatbot_history],[event, options, chatbot, chatbot_history]).then(clear_result, [], [result]).then(event_speech, [event], [event_content_tts])
-            continue_button.click(coutinue,[session, event, options, chatbot, chatbot_history],[event, options, chatbot, chatbot_history, result, tts_text]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(event_speech, [tts_text], [event_content_tts])
-            options.input(coutinue,[session, event, options, chatbot, chatbot_history],[event, options, chatbot, chatbot_history, result, tts_text]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(event_speech, [tts_text], [event_content_tts])
+            continue_button.click(coutinue,[session, event, options, gallery, chatbot, chatbot_history],[event, options, gallery, chatbot, chatbot_history, result, tts_text]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(event_speech, [tts_text], [event_content_tts])
+            options.input(coutinue,[session, event, options, gallery, chatbot, chatbot_history],[event, options, gallery, chatbot, chatbot_history, result, tts_text]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(event_speech, [tts_text], [event_content_tts])
             audio_text = gr.Textbox(visible=False)
             input_audio.stop_recording(asr_audio, [input_audio], [input_audio, audio_text]).then(
                 bot, [session, audio_text, chatbot], [audio_text, chatbot]).then(

@@ -149,6 +149,9 @@ class PlayerStatus:
     def set_battle_status(self, player_hp=100, enemy_hp=100, enemy_attack=10):
         self.battle_status = BattleStatus(player_hp, enemy_hp, enemy_attack)
 
+    def get_gallery(self):
+        self.current_event.get_gallery()
+
 class StatusManager:
     def __init__(self):
         # 缓存一天

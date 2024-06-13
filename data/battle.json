@@ -6,6 +6,7 @@
         "background": "",
         "purpose": ""
     },
+    "images":["battle_01.png"],
     "enemyInfo": {
         "hp": 100,
         "attack": 10

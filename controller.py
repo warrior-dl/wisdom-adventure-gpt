@@ -8,7 +8,7 @@ class Controller:
 
     def __init__(self):
         self.status_manager = StatusManager()
-        self.event_manager = EventManager("data/event_list.json", "data/data.json", "data/battle.json")
+        self.event_manager = EventManager("data/event_list.json", "data/data.json", "data/battle.json", "data/OEBPS/Images", "data/OEBPS/Battle_Images")
         self.llm = LLM()
         self.voice = Voice()
     def get_event(self, session):
@@ -166,4 +166,8 @@ class Controller:
                 logger.warning("battle_result: {}, msg: {}", battle_result, msg)
                 return battle_result, self.get_event_option(session, optionId)["result"] + "\n" + msg
 
+    
+    def get_gallery(self, session):
+        status = self.status_manager.get_status_with_session(session)
+        return status.current_event.get_images()
     
