@@ -1,5 +1,6 @@
 import re
 import json
+import time
 from status import PlayerStatus, StatusManager, BattleResult, GameStatus
 from event import EventManager
 from voice import Voice
@@ -107,6 +108,37 @@ class Controller:
                     return self.chat_with_npc(input, event_content, background, purpose, knowledge)
         return self.chat_with_guider(input, event_content)
     
+    def chat_and_speech(self, input, session = None):
+        text = self.chat(input, session)
+        # 获取本地时间戳
+        timestamp = time.time()
+        # 生成tts
+        for t in text:
+            self.push_tts_queue(session, t, timestamp)
+            yield t
+
+    def generate_tts(self, session, text):
+        # 获取时间戳
+        timestamp = time.time()
+        self.push_tts_queue(session, text, timestamp)
+
+    def push_tts_queue(self, session, text, timestamp):
+        status = self.status_manager.get_status_with_session(session)
+        # 请求的时间戳小于队列的时间戳，说明过期，不再请求
+        if timestamp < status.get_tts_queue_timer():
+            logger.info("timestamp timeout")
+            return
+        tts, duration  = self.get_tts(text)
+        status.push_tts(tts, duration)
+        status.update_tts_queue_timer(timestamp)
+
+    def pop_tts_queue(self, session):
+        status = self.status_manager.get_status_with_session(session)
+        return status.pop_tts_queue()
+    def clear_tts_queue(self, session):
+        status = self.status_manager.get_status_with_session(session)
+        status.clear_tts_queue()
+
     def referee_judge(self, session, input):
         status = self.status_manager.get_status_with_session(session)
         event = status.get_cur_event()
@@ -140,7 +172,7 @@ class Controller:
             logger.warning("json failed, str_out: {}", content)
             raise Exception("json failed, str_out: {}".format(content))
 
-    def get_tts(self, text):
+    def get_tts(self, text)-> tuple[str, int]:
         return self.voice.get_tts(text)
     
     def get_asr(self, audio):

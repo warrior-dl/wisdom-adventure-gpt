@@ -4,7 +4,7 @@ from event import Event
 from enum import Enum
 import cachetools
 from cachetools import TTLCache
-
+from typing import Optional, Tuple
 class Resource:
     def __init__(self, stellar_currency: int, ship_energy : int, exploration_capability : int, reputation_value : int):
         self.stellarCurrency = stellar_currency
@@ -75,6 +75,8 @@ class PlayerStatus:
         self.game_status = GameStatus.NOT_START
         self.game_time = 0
         self.history = []
+        self.tts_queue = []
+        self.tts_queue_timer = 0
     def set_cur_event(self, event: Event):
         self.current_event = event
     def get_cur_event(self) -> Event:
@@ -151,6 +153,30 @@ class PlayerStatus:
 
     def get_gallery(self):
         self.current_event.get_gallery()
+
+    def pop_tts_queue(self) -> Optional[Tuple[str, float]]:
+        """
+        Pop and return the first item from the tts_queue.
+
+        Returns:
+            Optional[Tuple[str, float]]: A tuple containing the TTS text and duration.
+                                       If the queue is empty, returns None.
+        """
+        if not self.tts_queue:
+            return None, None
+
+        tts, duration = self.tts_queue.pop(0)
+        return tts, duration
+    def push_tts(self, tts, duration):
+        self.tts_queue.append((tts, duration))
+
+    def clear_tts_queue(self):
+        self.tts_queue.clear()
+    
+    def get_tts_queue_timer(self):
+        return self.tts_queue_timer
+    def update_tts_queue_timer(self, time):
+        self.tts_queue_timer = time
 
 class StatusManager:
     def __init__(self):

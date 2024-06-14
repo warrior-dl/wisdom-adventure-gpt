@@ -14,14 +14,26 @@ class Voice:
         os.environ["APPBUILDER_TOKEN"] =  myKeys.APPBUILDER_TOKEN
         self.tts = appbuilder.TTS()
 
-    def get_tts(self, text):
+    def get_tts(self, text) -> tuple[str, float]:
+        if text == "" or text is None:
+            return None, None
+        logger.info("voice get tts: {}", text)
         inp = appbuilder.Message(content={"text": text})
         try:
-            out = self.tts.run(message=inp, person=4)
+            out = self.tts.run(message=inp, person=4, audio_type="wav")
+            temp_file = str(uuid.uuid4()) + ".wav"
+            wav_path =  os.path.join(os.getcwd(), "temp", temp_file)
+            with open(wav_path, "wb") as f:
+                f.write(out.content["audio_binary"])
+            # 获取wav文件音频时长
+            with wave.open(wav_path, 'rb') as f:
+                frames = f.getnframes()
+                rate = f.getframerate()
+                duration = frames / float(rate)
+            return wav_path, duration
         except Exception as e:
             logger.error("tts error: {}", e)
-            return None
-        return out.content["audio_binary"]
+            return None, None
     
     def get_asr(self, audio):
         asr = appbuilder.ASR()
