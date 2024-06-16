@@ -179,10 +179,14 @@ def start(session, chatbot, chatbot_history):
     return ec, radio, chatbot, chatbot_history, tts_text
 
 
-def bot(session, message, history):
+def bot(session, message, history, settings):
     history_langchain_format = format_history(history, message)
     logger.info("history_langchain_format: {}", history_langchain_format)
-    gpt_response = controller.chat_and_speech(history_langchain_format, session)
+    logger.info("settings: {}", settings)
+    if "语音播放" in settings:
+        gpt_response = controller.chat_and_speech(history_langchain_format, session)
+    else:
+        gpt_response = controller.chat(history_langchain_format, session)
     history = history + [[message, None]]
     history[-1][1] = ""
     for chunk in gpt_response:
@@ -265,7 +269,7 @@ def asr_audio(audio):
     logger.info("asr: {}", asr["result"])
     return None, asr["result"][0]
 
-def coutinue(session, event_content, option, gallery, chatbot, chatbot_history):
+def coutinue(session, event_content, option, gallery, chatbot, chatbot_history, settings):
     game_status = controller.get_game_status(session)
     event_result = ""
     tts_text = ""
@@ -291,8 +295,9 @@ def coutinue(session, event_content, option, gallery, chatbot, chatbot_history):
             controller.set_game_status(session, GameStatus.EVENT_GOING)
         case GameStatus.GAME_OVER:
             pass
-    controller.clear_tts_queue(session)
-    controller.generate_tts(session, tts_text)
+    if "语音播放" in settings:
+        controller.clear_tts_queue(session)
+        controller.generate_tts(session, tts_text)
     return event_content, radio, gallery, chatbot, chatbot_history, event_result
 
 if __name__ == '__main__':
@@ -307,6 +312,8 @@ if __name__ == '__main__':
             event_content_tts = gr.Audio(autoplay=True)
             options = gr.Radio(label="选项", choices=[])
             result = gr.Textbox(label="事件结果")
+            with gr.Row():
+                settings = gr.CheckboxGroup(["语音播放"], label="设置", info="语音播放设置")
             continue_button = gr.Button("行动")
             gallery = gr.Gallery(
                 label="images", show_label=False, elem_id="gallery"
@@ -326,11 +333,12 @@ if __name__ == '__main__':
             qustion_options = gr.Radio(label="问题推荐", choices=[])
             msg = gr.Textbox()
             audio_text = gr.Textbox(visible=False)
-            msg.submit(bot, [session, msg, chatbot], [msg, chatbot]).then(create_question, [session, chatbot], [qustion_options])
+            msg.submit(bot, [session, msg, chatbot, settings], [msg, chatbot]).then(create_question, [session, chatbot], [qustion_options])
             chatbot.change(play_tts_queue, [session], [event_content_tts])
             input_audio.stop_recording(asr_audio, [input_audio], [input_audio, audio_text]).then(
-                bot, [session, audio_text, chatbot], [audio_text, chatbot]).then(create_question, [session, chatbot], [qustion_options])
-            qo = qustion_options.input(bot, [session, qustion_options, chatbot], [qustion_options, chatbot]).then(create_question, [session, chatbot], [qustion_options])
-            continue_button.click(coutinue,[session, event, options, gallery, chatbot, chatbot_history],[event, options, gallery, chatbot, chatbot_history, result]).then(play_tts_queue, [session], [event_content_tts]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(create_question, [session, chatbot], [qustion_options])
-            options.input(coutinue,[session, event, options, gallery, chatbot, chatbot_history],[event, options, gallery, chatbot, chatbot_history, result]).then(play_tts_queue, [session], [event_content_tts]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(create_question, [session, chatbot], [qustion_options])
+                bot, [session, audio_text, chatbot, settings], [audio_text, chatbot]).then(create_question, [session, chatbot], [qustion_options])
+            qo = qustion_options.input(bot, [session, qustion_options, chatbot, settings], [qustion_options, chatbot]).then(create_question, [session, chatbot], [qustion_options])
+            continue_button.click(coutinue,[session, event, options, gallery, chatbot, chatbot_history, settings],[event, options, gallery, chatbot, chatbot_history, result]).then(play_tts_queue, [session], [event_content_tts]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(create_question, [session, chatbot], [qustion_options])
+            options.input(coutinue,[session, event, options, gallery, chatbot, chatbot_history, settings],[event, options, gallery, chatbot, chatbot_history, result]).then(play_tts_queue, [session], [event_content_tts]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(create_question, [session, chatbot], [qustion_options])
+            
     demo.queue().launch(server_name="0.0.0.0")
