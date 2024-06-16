@@ -3,6 +3,7 @@ from loguru import logger
 from event import Event
 from enum import Enum
 import cachetools
+import time
 from cachetools import TTLCache
 from typing import Optional, Tuple
 class Resource:
@@ -77,6 +78,7 @@ class PlayerStatus:
         self.history = []
         self.tts_queue = []
         self.tts_queue_timer = 0
+        self.record = []
     def set_cur_event(self, event: Event):
         self.current_event = event
     def get_cur_event(self) -> Event:
@@ -108,6 +110,7 @@ class PlayerStatus:
                 new_value = self.resource.get_value(key) + value
                 logger.info(f"status update: key: {key}, new_value: {new_value}")
                 self.resource.update(key, new_value)
+                self.push_record(key, value)
         self.current_event.used = True
     def get_battle_status(self)->BattleStatus: 
         return self.battle_status
@@ -177,6 +180,35 @@ class PlayerStatus:
         return self.tts_queue_timer
     def update_tts_queue_timer(self, time):
         self.tts_queue_timer = time
+
+    def get_record(self):
+        return self.record
+    
+    def push_record(self, key, value):
+        match key:
+            case "stellarCurrency":
+                if value > 0:
+                    msg = f"获得了 {value} 个星际货币"
+                else:
+                    msg = f"消耗了 {value} 个星际货币"
+            case "shipEnergy":
+                if value > 0:
+                    msg = f"飞船能量增加了 {value} "
+                else:
+                    msg = f"飞船能量消耗了 {value} "
+            case "explorationCapability":
+                if value > 0:
+                    msg = f"探索能力提升了 {value} "
+                else:
+                    msg = f"探索能力降低了 {value} "
+            case "reputationValue":
+                if value > 0:
+                    msg = f"获得了 {value} 声望"
+                else:
+                    msg = f"消耗了 {value} 声望"
+        # msg前添加时间
+        msg = f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())} {msg}"
+        self.record.append(msg)
 
 class StatusManager:
     def __init__(self):

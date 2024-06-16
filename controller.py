@@ -52,6 +52,9 @@ class Controller:
     def get_resource(self, session=None):
         status = self.status_manager.get_status_with_session(session)
         return status.get_resource()
+    def get_record(self, session=None):
+        status = self.status_manager.get_status_with_session(session)
+        return status.get_record()
 
     def update_resource(self, session:str, optionId:int):
         status = self.status_manager.get_status_with_session(session)

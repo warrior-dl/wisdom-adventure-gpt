@@ -300,45 +300,51 @@ def coutinue(session, event_content, option, gallery, chatbot, chatbot_history, 
         controller.generate_tts(session, tts_text)
     return event_content, radio, gallery, chatbot, chatbot_history, event_result
 
+def display_record(session) -> str:
+    record_list = controller.get_record(session)
+    return "\n".join(record_list)
 if __name__ == '__main__':
     with gr.Blocks(title='wisdom-adventure', theme=gr.themes.Soft()) as demo:
         session = gr.State(generate_session_id)
         chatbot_history = gr.State([])
-        with gr.Column():
-            intro = gr.Markdown(value=introduce())
-            resource = gr.Markdown(label="游戏资源", value=display_status())
-            battle = gr.Markdown(label="战斗状态", value=display_battle_status())
-            event = gr.Textbox(label="事件内容")
-            event_content_tts = gr.Audio(autoplay=True)
-            options = gr.Radio(label="选项", choices=[])
-            result = gr.Textbox(label="事件结果")
-            with gr.Row():
-                settings = gr.CheckboxGroup(["语音播放"], label="设置", info="语音播放设置")
-            continue_button = gr.Button("行动")
-            gallery = gr.Gallery(
-                label="images", show_label=False, elem_id="gallery"
-                , columns=[3], rows=[1], object_fit="contain", height="auto", interactive=False)
-            chatbot = gr.Chatbot()
-            input_audio = gr.Audio(
-                sources=["microphone"],
-                waveform_options=gr.WaveformOptions(
-                    waveform_color="#01C6FF",
-                    waveform_progress_color="#0066B4",
-                    skip_length=2,
-                    show_controls=False,
-                ),
-                type="filepath",
-            )
-            tts_text = gr.Textbox(label="语音", visible=False)
-            qustion_options = gr.Radio(label="问题推荐", choices=[])
-            msg = gr.Textbox()
-            audio_text = gr.Textbox(visible=False)
-            msg.submit(bot, [session, msg, chatbot, settings], [msg, chatbot]).then(create_question, [session, chatbot], [qustion_options])
-            chatbot.change(play_tts_queue, [session], [event_content_tts])
-            input_audio.stop_recording(asr_audio, [input_audio], [input_audio, audio_text]).then(
+        intro = gr.Markdown(value=introduce())
+        resource = gr.Markdown(label="游戏资源", value=display_status())
+        battle = gr.Markdown(label="战斗状态", value=display_battle_status())
+        with gr.Row():
+            with gr.Column():
+                event = gr.Textbox(label="事件内容")
+                options = gr.Radio(label="选项", choices=[])
+                result = gr.Textbox(label="事件结果")
+                record = gr.Textbox(label="游戏记录", interactive=False, autoscroll=True, max_lines=3)
+                gallery = gr.Gallery(
+                    label="images", show_label=False, elem_id="gallery"
+                    , columns=[3], rows=[1], object_fit="contain", height="auto", interactive=False)
+            with gr.Column():
+                chatbot = gr.Chatbot()
+                input_audio = gr.Audio(
+                    sources=["microphone"],
+                    waveform_options=gr.WaveformOptions(
+                        waveform_color="#01C6FF",
+                        waveform_progress_color="#0066B4",
+                        skip_length=2,
+                        show_controls=False,
+                    ),
+                    type="filepath",
+                )
+                tts_text = gr.Textbox(label="语音", visible=False)
+                qustion_options = gr.Radio(label="问题推荐", choices=[])
+                msg = gr.Textbox()
+                audio_text = gr.Textbox(visible=False)
+                with gr.Row():
+                    event_content_tts = gr.Audio(autoplay=True)
+                    settings = gr.CheckboxGroup(["语音播放"], label="设置", info="语音播放设置")
+        continue_button = gr.Button("行动")
+        msg.submit(bot, [session, msg, chatbot, settings], [msg, chatbot]).then(create_question, [session, chatbot], [qustion_options])
+        chatbot.change(play_tts_queue, [session], [event_content_tts])
+        input_audio.stop_recording(asr_audio, [input_audio], [input_audio, audio_text]).then(
                 bot, [session, audio_text, chatbot, settings], [audio_text, chatbot]).then(create_question, [session, chatbot], [qustion_options])
-            qo = qustion_options.input(bot, [session, qustion_options, chatbot, settings], [qustion_options, chatbot]).then(create_question, [session, chatbot], [qustion_options])
-            continue_button.click(coutinue,[session, event, options, gallery, chatbot, chatbot_history, settings],[event, options, gallery, chatbot, chatbot_history, result]).then(play_tts_queue, [session], [event_content_tts]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(create_question, [session, chatbot], [qustion_options])
-            options.input(coutinue,[session, event, options, gallery, chatbot, chatbot_history, settings],[event, options, gallery, chatbot, chatbot_history, result]).then(play_tts_queue, [session], [event_content_tts]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(create_question, [session, chatbot], [qustion_options])
+        qo = qustion_options.input(bot, [session, qustion_options, chatbot, settings], [qustion_options, chatbot]).then(create_question, [session, chatbot], [qustion_options])
+        continue_button.click(coutinue,[session, event, options, gallery, chatbot, chatbot_history, settings],[event, options, gallery, chatbot, chatbot_history, result]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(display_record, [session], [record]).then(play_tts_queue, [session], [event_content_tts]).then(create_question, [session, chatbot], [qustion_options])
+        options.input(coutinue,[session, event, options, gallery, chatbot, chatbot_history, settings],[event, options, gallery, chatbot, chatbot_history, result]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(display_record, [session], [record]).then(play_tts_queue, [session], [event_content_tts]).then(create_question, [session, chatbot], [qustion_options])
             
     demo.queue().launch(server_name="0.0.0.0")
