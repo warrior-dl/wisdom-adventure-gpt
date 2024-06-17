@@ -22,10 +22,10 @@ class Controller:
     def update_event(self, session) :
         status = self.status_manager.get_status_with_session(session)
         game_time = status.get_game_time()
+        if game_time >= 16:
+            # 结算
+            return False
         if game_time % 5 == 0 and game_time != 0:
-            if game_time >= 16:
-                # 结算
-                return False
             index, event = self.event_manager.get_battle_by_index(int(game_time/5)-1)
             status.set_cur_event(event)
             status.add_game_time()

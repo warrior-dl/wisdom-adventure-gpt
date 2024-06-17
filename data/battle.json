@@ -27,7 +27,7 @@
     "eventOptions": [
         {
             "optionId": 1,
-            "optionContent": "正面攻击",
+            "optionContent": "消耗5点能量，正面攻击",
             "result": "攻击成功",
             "award": [{
                 "key": "enemy_hp",
@@ -108,7 +108,7 @@
     "eventOptions": [
         {
             "optionId": 1,
-            "optionContent": "正面攻击",
+            "optionContent": "消耗5点能量，正面攻击",
             "result": "攻击成功",
             "award": [{
                 "key": "enemy_hp",
@@ -189,7 +189,7 @@
     "eventOptions": [
         {
             "optionId": 1,
-            "optionContent": "正面攻击",
+            "optionContent": "消耗5点能量，正面攻击",
             "result": "攻击成功",
             "award": [{
                 "key": "enemy_hp",

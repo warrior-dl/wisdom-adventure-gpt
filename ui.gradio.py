@@ -335,7 +335,7 @@ if __name__ == '__main__':
                 record = gr.Textbox(label="游戏记录", interactive=False, autoscroll=True, max_lines=3)
                 gallery = gr.Gallery(
                     label="images", show_label=False, elem_id="gallery"
-                    , columns=[3], rows=[1], object_fit="contain", height="auto", interactive=False)
+                    , columns=[2], rows=[1], object_fit="contain", height="auto", interactive=False)
             with gr.Column():
                 chatbot = gr.Chatbot()
                 input_audio = gr.Audio(
@@ -377,4 +377,4 @@ if __name__ == '__main__':
             play_tts_queue, [session], [event_content_tts]).then(
             create_question, [session, chatbot], [qustion_options])
             
-    demo.queue().launch(server_name="0.0.0.0")
+    demo.queue().launch(server_name="0.0.0.0", share=True)

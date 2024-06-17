@@ -11,18 +11,18 @@ from langchain_community.llms  import QianfanLLMEndpoint
 
 
 class LLM:
-    def __init__(self, origin="qianfan"):
+    def __init__(self, origin=""):
         os.environ["EB_AGENT_LOGGING_LEVEL"] = "INFO"
         os.environ["EB_AGENT_ACCESS_TOKEN"] =  myKeys.EB_AGENT_ACCESS_TOKEN
         os.environ["QIANFAN_AK"] = myKeys.QIANFAN_AK
         os.environ["QIANFAN_SK"] = myKeys.QIANFAN_SK
-        os.environ["LANGCHAIN_TRACING_V2"]="true"
-        os.environ["LANGCHAIN_API_KEY"]="ls__c0012d47edfc4b3a8c19c40242a3521e"
+        # os.environ["LANGCHAIN_TRACING_V2"]="true"
+        # os.environ["LANGCHAIN_API_KEY"]="ls__c0012d47edfc4b3a8c19c40242a3521e"
         if origin == "qianfan":
             logger.info("use qianfan llm")
-            self.llm = QianfanLLMEndpoint(model="ERNIE-Speed-8K")
+            self.llm = QianfanLLMEndpoint(model="ERNIE-4.0-8K-Preview-0518")
         else:
-            self.llm = ErnieBot(aistudio_access_token=myKeys.EB_AGENT_ACCESS_TOKEN, model="ernie-speed")
+            self.llm = ErnieBot(aistudio_access_token=myKeys.EB_AGENT_ACCESS_TOKEN, model="ernie-4.0")
         
         guider_prompt = "你是智途问答大冒险中的游戏助手，叫做小桨，你负责陪伴玩家在太空进行探险，用比较通俗易懂的方式解答玩家遇到的问题。当前游戏事件如下：{event_content}\n"
 
