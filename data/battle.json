@@ -77,4 +77,167 @@
             }]
         }
     ]
-}]
+},
+{
+    "eventName": "遭遇精英海盗舰长",
+    "eventContent": "你发现了一个由臭名昭著的精英海盗舰长率领的舰队，他们装备精良且战术狡猾。击败他们将是一场硬仗。",
+    "eventType": "battle",
+    "eventCharacters": {
+        "background": "曾是星际联盟的高级指挥官，因不满政治腐败而叛逃，成为星际中最危险的海盗之一。",
+        "purpose": "寻找传说中的宇宙宝藏以建立自己的星际帝国。"
+    },
+    "images":["battle_01.png"],
+    "enemyInfo": {
+        "hp": 200,
+        "attack": 20
+    },
+    "eventAward": [
+        {
+            "key": "stellarCurrency",
+            "value": 200
+        },
+        {
+            "key": "shipEnergy",
+            "value": 100
+        },
+        {
+            "key": "reputationValue",
+            "value": 75
+        }
+    ],
+    "eventOptions": [
+        {
+            "optionId": 1,
+            "optionContent": "正面攻击",
+            "result": "攻击成功",
+            "award": [{
+                "key": "enemy_hp",
+                "value": "explorationCapability"
+            },
+            {
+                "key": "shipEnergy",
+                "value": -5
+            }]
+        },
+        {
+            "optionId": 2,
+            "optionContent": "消耗5点声誉，呼叫增援",
+            "result": "敌人血量减少100",
+            "award": [{
+                "key": "reputationValue",
+                "value": -5
+            },
+            {   "key": "enemy_hp",
+                "value": 100
+            }]
+        },
+        {
+            "optionId": 3,
+            "optionContent": "花费40个货币修复飞船",
+            "result": "飞船血量恢复40",
+            "award": [{
+                "key": "player_hp",
+                "value": 40
+            },
+            {
+                "key": "stellarCurrency",
+                "value": -40
+            }]
+        },
+        {
+            "optionId": 4,
+            "optionContent": "花费30个货币补给能量",
+            "result": "能量恢复30",
+            "award": [{
+                "key": "shipEnergy",
+                "value": 30
+            },
+            {
+                "key": "stellarCurrency",
+                "value": -30
+            }]
+        }
+    ]
+},
+{
+    "eventName": "决战暗影领主",
+    "eventContent": "经过无数战斗与探索，你终于追踪到了暗影领主的藏身之处——虚空深渊。这里充满了扭曲的时空与未知的危险，但也是结束这一切的关键。准备迎接宇宙中最艰难的挑战吧！",
+    "eventType": "battle",
+    "eventCharacters": {
+        "background": "曾是一位伟大的宇宙守护者，但在追求绝对力量的道路上迷失，最终堕落为暗影领主，意图征服整个银河。",
+        "purpose": "通过收集宇宙中的古老遗物，开启禁忌仪式，实现对所有生命的绝对统治。"
+    },
+    "images":["battle_01.png"],
+    "enemyInfo": {
+        "hp": 500,
+        "attack": 35
+    },
+    "eventAward": [
+        {
+            "key": "stellarCurrency",
+            "value": 500
+        },
+        {
+            "key": "shipEnergy",
+            "value": 100
+        },
+        {
+            "key": "reputationValue",
+            "value": 100
+        }
+    ],
+    "eventOptions": [
+        {
+            "optionId": 1,
+            "optionContent": "正面攻击",
+            "result": "攻击成功",
+            "award": [{
+                "key": "enemy_hp",
+                "value": "explorationCapability"
+            },
+            {
+                "key": "shipEnergy",
+                "value": -5
+            }]
+        },
+        {
+            "optionId": 2,
+            "optionContent": "消耗5点声誉，呼叫增援",
+            "result": "敌人血量减少100",
+            "award": [{
+                "key": "reputationValue",
+                "value": -5
+            },
+            {   "key": "enemy_hp",
+                "value": 100
+            }]
+        },
+        {
+            "optionId": 3,
+            "optionContent": "花费50个货币修复飞船",
+            "result": "飞船血量恢复50",
+            "award": [{
+                "key": "player_hp",
+                "value": 50
+            },
+            {
+                "key": "stellarCurrency",
+                "value": -50
+            }]
+        },
+        {
+            "optionId": 4,
+            "optionContent": "花费30个货币补给能量",
+            "result": "能量恢复30",
+            "award": [{
+                "key": "shipEnergy",
+                "value": 30
+            },
+            {
+                "key": "stellarCurrency",
+                "value": -30
+            }]
+        }
+    ]
+}
+]

@@ -119,7 +119,7 @@ def submit(session, option, history):
                 next_game_status = GameStatus.EVENT_GOING
             if battle_result == BattleResult.ENEMY_WIN:
                 result = msg
-                next_game_status = GameStatus.EVENT_END
+                next_game_status = GameStatus.GAME_OVER
             if battle_result == BattleResult.NOT_FINISHED:
                 result = msg
                 next_game_status = GameStatus.EVENT_GOING
@@ -130,7 +130,8 @@ def submit(session, option, history):
 
 def start(session, chatbot, chatbot_history):
     logger.info("session: {}".format(session))
-    game_clear_text =  "恭喜！你已完成所有探险事件！"
+    next_game_status = GameStatus.EVENT_GOING
+    game_clear_text =  "恭喜！你已通关！"
     old = controller.get_event(session)
     old_event_type = None
     tts_text = ""
@@ -138,12 +139,14 @@ def start(session, chatbot, chatbot_history):
         old_event_type = controller.get_event(session).get_type()
     ret = controller.update_event(session)
     if not ret:
-        logger.info("No more event")
-        return game_clear_text, None, chatbot, chatbot_history, game_clear_text
+        logger.info("game end")
+        next_game_status = GameStatus.GAME_OVER
+        return game_clear_text, None, chatbot, chatbot_history, game_clear_text, next_game_status
     event = controller.get_event(session).get_content()
     if event is None:
         logger.error("No event")
-        return game_clear_text, None, chatbot, chatbot_history, game_clear_text
+        next_game_status = GameStatus.GAME_OVER
+        return game_clear_text, None, chatbot, chatbot_history, game_clear_text, next_game_status
     logger.info("event: {}".format(event))
     ec = event["eventContent"]
     tts_text = ec
@@ -176,7 +179,7 @@ def start(session, chatbot, chatbot_history):
     logger.info("content: {}".format(ec))
     logger.info("options: {}".format(str_options))
     radio = gr.Radio(str_options,label="选项")
-    return ec, radio, chatbot, chatbot_history, tts_text
+    return ec, radio, chatbot, chatbot_history, tts_text, next_game_status
 
 
 def bot(session, message, history, settings):
@@ -208,10 +211,6 @@ def create_question(session, history):
         return []
     return gr.Radio(result, label="问题推荐", interactive=True)
 
-def add_text(history, text, chatbot):
-    history = history + [(text, None)]
-    return history, ""
-
 def display_status(session=None) -> str:
     """Return a markdown string displaying the player's status."""
     logger.info("session: {}", session)
@@ -223,19 +222,19 @@ def display_status(session=None) -> str:
         f"**探索能力**: {status.explorationCapability} "
         f"**声誉值**: {status.reputationValue}"
     )
-def display_battle_status(session=None) -> str:
+def display_battle_status(session) :
     """Return a markdown string displaying the player's status."""
     logger.info("session: {}", session)
     event = controller.get_event(session)
     if event is None:
-        return None
+        return gr.update(visible=False), None, None, None, None
     event_type = event.get_type()
     if event_type == "battle":
         status = controller.get_battle_status(session)
-        return (
-            f"### **玩家血量**: {status.get_player_hp()}  "
-            f"**敌人血量**: {status.get_enemy_hp()} "
-        )
+        enemy_hp, enemy_max = status.get_enemy_hp(), status.get_enemy_max_hp()
+        player_hp, player_max_hp = status.get_player_hp(), status.get_player_max_hp()
+        return gr.update(visible=True), enemy_hp, enemy_hp / enemy_max * 100, player_hp, player_hp / player_max_hp * 100
+    return gr.update(visible=False), None, None, None, None
 def introduce():
     return (        "## 智途问答大冒险 <br /> \n"
         "### 你是一名勇敢的星际探险家，与智能AI助手小桨一同驾驶着先进的宇宙飞船，穿梭于广袤无垠的宇宙中，展开一段充满未知与挑战的探险旅程。 <br /> \n")
@@ -276,9 +275,9 @@ def coutinue(session, event_content, option, gallery, chatbot, chatbot_history, 
     radio = None
     match game_status:
         case GameStatus.NOT_START:
-            event_content, radio, chatbot, chatbot_history, tts_text = start(session, chatbot, chatbot_history)
+            event_content, radio, chatbot, chatbot_history, tts_text, next_game_status= start(session, chatbot, chatbot_history)
             gallery = display_gallery(session)
-            controller.set_game_status(session, GameStatus.EVENT_GOING)
+            controller.set_game_status(session, next_game_status)
         case GameStatus.EVENT_GOING:
             event_result, next_game_status = submit(session, option, chatbot)
             event = controller.get_event(session)
@@ -289,11 +288,13 @@ def coutinue(session, event_content, option, gallery, chatbot, chatbot_history, 
                 tts_text = event_result
             controller.set_game_status(session, next_game_status)
         case GameStatus.EVENT_END:
-            event_content, radio, chatbot, chatbot_history, tts_text = start(session, chatbot, chatbot_history)
+            event_content, radio, chatbot, chatbot_history, tts_text, next_game_status = start(session, chatbot, chatbot_history)
             event_result = ""
             gallery = display_gallery(session)
-            controller.set_game_status(session, GameStatus.EVENT_GOING)
+            controller.set_game_status(session, next_game_status)
         case GameStatus.GAME_OVER:
+            score = controller.calculate_score(session)
+            event_content = f"游戏结束，得分：{score}"
             pass
     if "语音播放" in settings:
         controller.clear_tts_queue(session)
@@ -303,16 +304,32 @@ def coutinue(session, event_content, option, gallery, chatbot, chatbot_history, 
 def display_record(session) -> str:
     record_list = controller.get_record(session)
     return "\n".join(record_list)
+
+def display_progress(session) -> int:
+    return controller.get_game_time(session)
+
 if __name__ == '__main__':
-    with gr.Blocks(title='wisdom-adventure', theme=gr.themes.Soft()) as demo:
+    with open("hp.html", "r", encoding="utf-8") as f:
+        hp_html = f.read()
+    with open("ui.css", "r", encoding="utf-8") as f:
+        css = f.read()
+    with open("ui.js", "r", encoding="utf-8") as f:
+        js = f.read()
+    with gr.Blocks(title='wisdom-adventure', theme=gr.themes.Soft(), css=css, js=js) as demo:
         session = gr.State(generate_session_id)
         chatbot_history = gr.State([])
         intro = gr.Markdown(value=introduce())
         resource = gr.Markdown(label="游戏资源", value=display_status())
-        battle = gr.Markdown(label="战斗状态", value=display_battle_status())
+        # battle = gr.Markdown(label="战斗状态", value=display_battle_status())
+        play_hp = gr.Number(elem_id="playerHp", visible=False)
+        enemy_hp = gr.Number(elem_id="enemyHp", visible=False)
+        play_hp_percent = gr.Number(elem_id="playerHpPercent", visible=False)
+        enemy_hp_percent = gr.Number(elem_id="enemyHpPercent", visible=False)
         with gr.Row():
             with gr.Column():
+                game_progress = gr.Slider(label="游戏进度", minimum=0, maximum=15, value=0, step=1)
                 event = gr.Textbox(label="事件内容")
+                hp = gr.HTML(value=hp_html, visible=False)
                 options = gr.Radio(label="选项", choices=[])
                 result = gr.Textbox(label="事件结果")
                 record = gr.Textbox(label="游戏记录", interactive=False, autoscroll=True, max_lines=3)
@@ -343,8 +360,21 @@ if __name__ == '__main__':
         chatbot.change(play_tts_queue, [session], [event_content_tts])
         input_audio.stop_recording(asr_audio, [input_audio], [input_audio, audio_text]).then(
                 bot, [session, audio_text, chatbot, settings], [audio_text, chatbot]).then(create_question, [session, chatbot], [qustion_options])
-        qo = qustion_options.input(bot, [session, qustion_options, chatbot, settings], [qustion_options, chatbot]).then(create_question, [session, chatbot], [qustion_options])
-        continue_button.click(coutinue,[session, event, options, gallery, chatbot, chatbot_history, settings],[event, options, gallery, chatbot, chatbot_history, result]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(display_record, [session], [record]).then(play_tts_queue, [session], [event_content_tts]).then(create_question, [session, chatbot], [qustion_options])
-        options.input(coutinue,[session, event, options, gallery, chatbot, chatbot_history, settings],[event, options, gallery, chatbot, chatbot_history, result]).then(display_battle_status, [session], [battle]).then(display_status, [session], [resource]).then(display_record, [session], [record]).then(play_tts_queue, [session], [event_content_tts]).then(create_question, [session, chatbot], [qustion_options])
+        qo = qustion_options.input(bot, [session, qustion_options, chatbot, settings], [qustion_options, chatbot]).then(
+            create_question, [session, chatbot], [qustion_options])
+        continue_button.click(coutinue,[session, event, options, gallery, chatbot, chatbot_history, settings],[event, options, gallery, chatbot, chatbot_history, result]).then(
+            display_battle_status, [session], [hp, enemy_hp, enemy_hp_percent, play_hp, play_hp_percent]).then(
+            display_status, [session], [resource]).then(
+            display_record, [session], [record]).then(
+            display_progress, [session], [game_progress]).then(
+            play_tts_queue, [session], [event_content_tts]).then(
+            create_question, [session, chatbot], [qustion_options])
+        options.input(coutinue,[session, event, options, gallery, chatbot, chatbot_history, settings],[event, options, gallery, chatbot, chatbot_history, result]).then(
+            display_battle_status, [session], [hp, enemy_hp, enemy_hp_percent, play_hp, play_hp_percent]).then(
+            display_status, [session], [resource]).then(
+            display_record, [session], [record]).then(
+            display_progress, [session], [game_progress]).then(
+            play_tts_queue, [session], [event_content_tts]).then(
+            create_question, [session, chatbot], [qustion_options])
             
     demo.queue().launch(server_name="0.0.0.0")

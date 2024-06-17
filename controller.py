@@ -23,7 +23,10 @@ class Controller:
         status = self.status_manager.get_status_with_session(session)
         game_time = status.get_game_time()
         if game_time % 5 == 0 and game_time != 0:
-            index, event = self.event_manager.get_battle_by_index(0)
+            if game_time >= 16:
+                # 结算
+                return False
+            index, event = self.event_manager.get_battle_by_index(int(game_time/5)-1)
             status.set_cur_event(event)
             status.add_game_time()
             enemy_info = event.get_enemy_info()
@@ -227,3 +230,10 @@ class Controller:
         status = self.status_manager.get_status_with_session(session)
         return status.current_event.get_images()
     
+    def get_game_time(self, session):
+        status = self.status_manager.get_status_with_session(session)
+        return status.get_game_time()
+    # 结算游戏积分
+    def calculate_score(self, session):
+        status = self.status_manager.get_status_with_session(session)
+        return status.calculate_score()

@@ -31,8 +31,10 @@ class Resource:
 
 class BattleStatus:
     def __init__(self, player_hp: int, enemy_hp: int, enemy_attack: int) -> None:
+        self.enemy_max_hp = enemy_hp
+        self.player_max_hp = player_hp
         self.player_hp = player_hp
-        self.enemy_hp = enemy_hp
+        self.enemy_hp = enemy_hp 
         self.enemy_attack = enemy_attack
 
     def get_status(self):
@@ -43,9 +45,13 @@ class BattleStatus:
     
     def update_player_hp(self, value):
         self.player_hp += value
+        if self.player_hp < 0:
+            self.player_hp = 0
     
     def update_enemy_hp(self, value):
         self.enemy_hp -= value
+        if self.enemy_hp < 0:
+            self.enemy_hp = 0
     
     def get_player_hp(self):
         return self.player_hp
@@ -53,6 +59,11 @@ class BattleStatus:
     def get_enemy_hp(self):
         return self.enemy_hp
 
+    def get_player_max_hp(self):
+        return self.player_max_hp
+    
+    def get_enemy_max_hp(self):
+        return self.enemy_max_hp
 
 # 战斗结果枚举
 class BattleResult(Enum):
@@ -209,6 +220,14 @@ class PlayerStatus:
         # msg前添加时间
         msg = f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())} {msg}"
         self.record.append(msg)
+    
+    def calculate_score(self):
+        score = 0
+        score += self.resource.stellarCurrency
+        score += self.resource.shipEnergy * 10
+        score += self.resource.explorationCapability * 100
+        score += self.resource.reputationValue * 100
+        return score
 
 class StatusManager:
     def __init__(self):
