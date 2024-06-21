@@ -89,15 +89,15 @@ class EventManager:
         if len(self.event_list) == 0:
             return None
         index = random.randint(0, len(self.event_list)-1)
-        
-        original_images =self.original_event[index]["images"]
+        original_id = self.event_list[index]["id"]
+        original_images =self.original_event[original_id]["images"]
         images_path = []
         if len(original_images) != 0:
             # 从original_images列表中的类似"../Images/figure_0131_0297.jpg"中提取文件名
             images_name = [os.path.basename(filename) for filename in original_images]
             # 组合self.image_path
             images_path = [os.path.join(self.event_image_path, name) for name in images_name]
-        return index, Event(index, self.event_list[index], images_path)
+        return index, Event(original_id, self.event_list[index], images_path)
     
     def get_original_event_by_index(self, index):
         if index < 0 or index >= len(self.original_event):

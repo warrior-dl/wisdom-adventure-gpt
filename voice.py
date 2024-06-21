@@ -13,6 +13,9 @@ class Voice:
     def __init__(self):
         os.environ["APPBUILDER_TOKEN"] =  myKeys.APPBUILDER_TOKEN
         self.tts = appbuilder.TTS()
+        ## 创建temp文件夹
+        if not os.path.exists("temp"):
+            os.mkdir("temp")
 
     def get_tts(self, text) -> tuple[str, float]:
         if text == "" or text is None:
@@ -22,7 +25,7 @@ class Voice:
         try:
             out = self.tts.run(message=inp, person=4, audio_type="wav")
             temp_file = str(uuid.uuid4()) + ".wav"
-            wav_path =  os.path.join(os.getcwd(), "temp", temp_file)
+            wav_path =  os.path.join("temp", temp_file)
             with open(wav_path, "wb") as f:
                 f.write(out.content["audio_binary"])
             # 获取wav文件音频时长
@@ -30,7 +33,8 @@ class Voice:
                 frames = f.getnframes()
                 rate = f.getframerate()
                 duration = frames / float(rate)
-            return wav_path, duration
+            # 加0.5秒停顿
+            return wav_path, duration + 0.5
         except Exception as e:
             logger.error("tts error: {}", e)
             return None, None
@@ -39,7 +43,7 @@ class Voice:
         asr = appbuilder.ASR()
         # 生成临时文件名
         temp_file = str(uuid.uuid4()) + ".wav"
-        wavfile = os.path.join(os.getcwd(), "temp", temp_file)
+        wavfile = os.path.join("temp", temp_file)
         self.resample_rate(audio, wavfile)
         # 读取音频文件
         raw_audio = open(wavfile, "rb").read()

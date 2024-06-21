@@ -1,8 +1,8 @@
-appbuilder_sdk==0.7.1
+appbuilder_sdk==0.8.0
 cachetools==5.3.0
 erniebot==0.5.5
 erniebot_agent==0.5.2
-gradio==4.36.1
+gradio==4.26.0
 langchain==0.2.5
 langchain_community==0.2.5
 langchain_core==0.2.7

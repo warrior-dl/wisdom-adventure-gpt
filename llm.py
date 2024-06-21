@@ -35,7 +35,7 @@ class LLM:
         ## 问答prompt
         self.npc_prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "你需要根据以下的游戏事件，人物背景，目的，科普知识扮演游戏人物，与玩家进行对话，达成目的，引导玩家进行选择。不要暴露你是在扮演。\n" \
+                ("system", "你需要根据以下的游戏事件，人物背景，目的，科普知识扮演游戏人物，与玩家进行对话，达成目的，引导玩家进行选择。不要暴露你是在扮演。不要输出AI前缀。\n" \
                             "游戏事件：{event_content}\n" \
                             "人物背景：{background}\n" \
                             "目的：{purpose}\n" \
@@ -58,7 +58,7 @@ class LLM:
         ## 问题推荐
         self.question_prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", "你需要根据以下的游戏事件和玩家对话，推荐三个科普知识问题或者选项供玩家进行选择。使用json格式输出结果。\n" \
+                ("system", "你需要根据以下的游戏事件、选项以及玩家对话，推荐三个问题供玩家进行选择。使用json格式输出结果。\n" \
                             "输出格式示例：" + question_example + "\n" \
                             "游戏事件：{event_content}\n" \
                             "玩家对话：```{messages}```\n"),

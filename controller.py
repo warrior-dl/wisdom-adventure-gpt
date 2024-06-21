@@ -1,4 +1,4 @@
-import re
+import os
 import json
 import time
 from status import PlayerStatus, StatusManager, BattleResult, GameStatus
@@ -6,6 +6,7 @@ from event import EventManager
 from voice import Voice
 from loguru import logger
 from llm import LLM
+import wave
 class Controller:
 
     def __init__(self):
@@ -128,6 +129,22 @@ class Controller:
         timestamp = time.time()
         self.push_tts_queue(session, text, timestamp)
 
+    def push_event_option_tts(self, session, id, option_id):
+        timestamp = time.time()
+        # 拼接文件名
+        file_name = f"{id}-option-{option_id}.wav"
+        # 拼接路径
+        file_path = os.path.join("data/TTS", file_name)
+        self.push_tts_queue_with_file(session, file_path, timestamp)
+    
+    def push_event_content_tts(self, session, id):
+        timestamp = time.time()
+        # 拼接文件名
+        file_name = f"{id}-content.wav"
+        # 拼接路径
+        file_path = os.path.join("data/TTS", file_name)
+        self.push_tts_queue_with_file(session, file_path, timestamp)
+
     def push_tts_queue(self, session, text, timestamp):
         status = self.status_manager.get_status_with_session(session)
         # 请求的时间戳小于队列的时间戳，说明过期，不再请求
@@ -136,6 +153,22 @@ class Controller:
             return
         tts, duration  = self.get_tts(text)
         status.push_tts(tts, duration)
+        status.update_tts_queue_timer(timestamp)
+
+    def push_tts_queue_with_file(self, session, wav_path, timestamp):
+        status = self.status_manager.get_status_with_session(session)
+        # 请求的时间戳小于队列的时间戳，说明过期，不再请求
+        if timestamp < status.get_tts_queue_timer():
+            logger.info("timestamp timeout")
+            return
+        if not os.path.exists(wav_path):
+            logger.warning("wav_path not exists: {}", wav_path)
+            return
+        with wave.open(wav_path, 'rb') as f:
+            frames = f.getnframes()
+            rate = f.getframerate()
+            duration = frames / float(rate)
+        status.push_tts(wav_path, duration)
         status.update_tts_queue_timer(timestamp)
 
     def pop_tts_queue(self, session):

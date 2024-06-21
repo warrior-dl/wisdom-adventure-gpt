@@ -1,8 +1,6 @@
 import gradio as gr
 import uuid
 import time
-from io import BytesIO
-import base64
 from loguru import logger
 from controller import Controller
 from status import GameStatus, BattleResult
@@ -19,18 +17,10 @@ def format_history(history, message):
     history_langchain_format.append(HumanMessage(content=message))
     return history_langchain_format
 
-def submit_choice_event(session, option):
-    if option == []:
+def submit_choice_event(session, optionId):
+    if optionId is None:
         return None
-    logger.info("player options: {}".format(option))
-    try:
-        ## 取出option中: 前的数字id
-        optionId = option.split(":")[0]
-        # 转为int
-        optionId = int(optionId)
-    except:
-        optionId = None
-        logger.error("optionId is not int: {}".format(optionId))
+    logger.info("player optionId: {}".format(optionId))
 
     return settle_event_result(session, optionId)
 
@@ -75,24 +65,12 @@ def submit_characterInteraction_event(session, history):
         return "你道别后重新出发，未收获特别的资源"
     return result
 
-def submit_battle_event(session, option):
-    if option == []:
-        return None
-    logger.info("player options: {}".format(option))
-    try:
-        ## 取出option中: 前的数字id
-        optionId = option.split(":")[0]
-        # 转为int
-        optionId = int(optionId)
-    except:
-        optionId = None
-        logger.error("optionId is not int: {}".format(optionId))
-
+def submit_battle_event(session, optionId):
     battle_result, msg = get_battle_result(session, optionId)
     return battle_result, msg
 
-def submit(session, option, history):
-    logger.info("session: {}, option: {}".format(session, option))
+def submit(session, optionId, history):
+    logger.info("session: {}, optionId: {}".format(session, optionId))
     event = controller.get_event(session)
     if event is None:
         return None, GameStatus.NOT_START
@@ -102,15 +80,15 @@ def submit(session, option, history):
     result = ""
     match event_type:
         case "choice":
-            if option == None:
+            if optionId == None:
                 return None, GameStatus.EVENT_GOING
-            result = submit_choice_event(session, option)
+            result = submit_choice_event(session, optionId)
         case "characterInteraction":
             result = submit_characterInteraction_event(session,  history)
         case "battle":
-            if option == None:
+            if optionId == None:
                 return None, GameStatus.EVENT_GOING
-            battle_result, msg = submit_battle_event(session, option)
+            battle_result, msg = submit_battle_event(session, optionId)
             if battle_result == BattleResult.PLAYER_WIN:
                 result = msg
                 next_game_status = GameStatus.EVENT_END
@@ -148,8 +126,7 @@ def start(session, chatbot, chatbot_history):
         next_game_status = GameStatus.GAME_OVER
         return game_clear_text, None, chatbot, chatbot_history, game_clear_text, next_game_status
     logger.info("event: {}".format(event))
-    ec = event["eventContent"]
-    tts_text = ec
+    tts_text = ""
     new_event_type = controller.get_event(session).get_type()
     logger.info("old_event_type: {}", old_event_type)
     logger.info("now event type: {}", new_event_type)
@@ -159,7 +136,7 @@ def start(session, chatbot, chatbot_history):
             chatbot_history = chatbot
             self_introduction = controller.get_event(session).get_self_introduction()
             chatbot = [["", self_introduction]]
-            tts_text = tts_text + "\n" + self_introduction
+            tts_text =  self_introduction
         # 角色事件切换到非角色事件
         if old_event_type == "characterInteraction" and new_event_type != "characterInteraction":
             chatbot = chatbot_history
@@ -167,19 +144,18 @@ def start(session, chatbot, chatbot_history):
         if old_event_type == "characterInteraction" and new_event_type == "characterInteraction":
             self_introduction = controller.get_event(session).get_self_introduction()
             chatbot = [["", self_introduction]]
-            tts_text = tts_text + "\n" + self_introduction
+            tts_text =  self_introduction
     elif new_event_type == "characterInteraction":
         self_introduction = controller.get_event(session).get_self_introduction()
         chatbot = [["", self_introduction]]
-        tts_text = tts_text + "\n" + self_introduction
+        tts_text =  + self_introduction
     options = event["eventOptions"]
     str_options = [f"{option['optionId']}: {option['optionContent']}" for option in options]
     if new_event_type == "characterInteraction":
         str_options = []
-    logger.info("content: {}".format(ec))
     logger.info("options: {}".format(str_options))
     radio = gr.Radio(str_options,label="选项")
-    return ec, radio, chatbot, chatbot_history, tts_text, next_game_status
+    return event["eventContent"], radio, chatbot, chatbot_history, tts_text, next_game_status
 
 
 def bot(session, message, history, settings):
@@ -273,32 +249,48 @@ def coutinue(session, event_content, option, gallery, chatbot, chatbot_history, 
     event_result = ""
     tts_text = ""
     radio = None
+    enable_tts = False
+    if "语音播放" in settings:
+        enable_tts = True
+        controller.clear_tts_queue(session)
     match game_status:
-        case GameStatus.NOT_START:
+        case GameStatus.NOT_START | GameStatus.EVENT_END:
             event_content, radio, chatbot, chatbot_history, tts_text, next_game_status= start(session, chatbot, chatbot_history)
-            gallery = display_gallery(session)
-            controller.set_game_status(session, next_game_status)
-        case GameStatus.EVENT_GOING:
-            event_result, next_game_status = submit(session, option, chatbot)
-            event = controller.get_event(session)
-            if event is None:
-                return None, GameStatus.NOT_START
-            event_type = event.get_type()
-            if event_type != "battle":
-                tts_text = event_result
-            controller.set_game_status(session, next_game_status)
-        case GameStatus.EVENT_END:
-            event_content, radio, chatbot, chatbot_history, tts_text, next_game_status = start(session, chatbot, chatbot_history)
             event_result = ""
             gallery = display_gallery(session)
             controller.set_game_status(session, next_game_status)
+            if enable_tts:
+                event = controller.get_event(session)
+                event_type = event.get_type()
+                if event_type != "battle":
+                    controller.push_event_content_tts(session, event.get_id())
+                    controller.generate_tts(session, tts_text)
+        case GameStatus.EVENT_GOING:
+            try:
+                ## 取出option中: 前的数字id
+                optionId = option.split(":")[0]
+                # 转为int
+                optionId = int(optionId)
+            except:
+                optionId = None
+                logger.warning("optionId is not int: {}".format(optionId))
+            event_result, next_game_status = submit(session, optionId, chatbot)
+            event = controller.get_event(session)
+            if event is None:
+                return None, GameStatus.NOT_START
+            controller.set_game_status(session, next_game_status)
+            event_type = event.get_type()
+            if enable_tts:
+                if event_type == "choice":
+                    controller.clear_tts_queue(session)
+                    controller.push_event_option_tts(session, event.get_id(), optionId)
+                elif event_type == "characterInteraction":
+                    controller.clear_tts_queue(session)
+                    controller.generate_tts(session, event_result)
         case GameStatus.GAME_OVER:
             score = controller.calculate_score(session)
             event_content = f"游戏结束，得分：{score}"
-            pass
-    if "语音播放" in settings:
-        controller.clear_tts_queue(session)
-        controller.generate_tts(session, tts_text)
+
     return event_content, radio, gallery, chatbot, chatbot_history, event_result
 
 def display_record(session) -> str:
@@ -377,4 +369,5 @@ if __name__ == '__main__':
             play_tts_queue, [session], [event_content_tts]).then(
             create_question, [session, chatbot], [qustion_options])
             
+    # demo.queue().launch(server_name="0.0.0.0", share=True, allowed_paths=["/home/aistudio/"])
     demo.queue().launch(server_name="0.0.0.0", share=True)
