@@ -148,7 +148,7 @@ def start(session, chatbot, chatbot_history):
     elif new_event_type == "characterInteraction":
         self_introduction = controller.get_event(session).get_self_introduction()
         chatbot = [["", self_introduction]]
-        tts_text =  + self_introduction
+        tts_text = self_introduction
     options = event["eventOptions"]
     str_options = [f"{option['optionId']}: {option['optionContent']}" for option in options]
     if new_event_type == "characterInteraction":
@@ -161,7 +161,7 @@ def start(session, chatbot, chatbot_history):
 def bot(session, message, history, settings):
     history_langchain_format = format_history(history, message)
     logger.info("history_langchain_format: {}", history_langchain_format)
-    logger.info("settings: {}", settings)
+    logger.debug("settings: {}", settings)
     if "语音播放" in settings:
         gpt_response = controller.chat_and_speech(history_langchain_format, session)
     else:
@@ -169,7 +169,6 @@ def bot(session, message, history, settings):
     history = history + [[message, None]]
     history[-1][1] = ""
     for chunk in gpt_response:
-        logger.info("chunk: {}", chunk)
         history[-1][1] += chunk
         time.sleep(0.05)
         yield "", history
@@ -227,9 +226,9 @@ def play_tts_queue(session):
     time.sleep(1)
     while True:
         tts, duration = controller.pop_tts_queue(session)
-        logger.info("tts: {}", tts)
         if tts is None:
             return None
+        logger.info("tts: {}", tts)
         yield tts
         time.sleep(duration)
 

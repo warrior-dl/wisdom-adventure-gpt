@@ -81,7 +81,10 @@ class Controller:
             if option["optionId"] == optionId:
                 return option
     def chat_with_guider(self, input, event_content):
-        output = self.llm.chat_with_guider(input, event_content)
+        question = self.llm.chat_with_reorganize(input, event_content)
+        logger.info("controller reorganize: {}", question)
+        rag_content = self.llm.rag(question)
+        output = self.llm.chat_with_guider(input, event_content, rag_content)
         logger.info("controller guider: {}", output)
         return output
     
@@ -201,15 +204,18 @@ class Controller:
         if event is None:
             logger.warning("current event is None")
             raise Exception("current event is None")
-        event_content = event.get_content()
-        str_out =  self.chat_with_question(input, event_content)
-        try:
-            content = str_out.replace("```json", "").replace("```", "")
-            ## json序列化
-            return json.loads(content)
-        except:
-            logger.warning("json failed, str_out: {}", content)
-            raise Exception("json failed, str_out: {}".format(content))
+        event_type = event.get_type()
+        if event_type != "battle":
+            event_content = event.get_content()
+            str_out =  self.chat_with_question(input, event_content)
+            try:
+                content = str_out.replace("```json", "").replace("```", "")
+                ## json序列化
+                return json.loads(content)
+            except:
+                logger.warning("json failed, str_out: {}", content)
+                raise Exception("json failed, str_out: {}".format(content))
+        return []
 
     def get_tts(self, text)-> tuple[str, int]:
         return self.voice.get_tts(text)

@@ -8,7 +8,12 @@ from langchain_core.output_parsers import StrOutputParser
 from loguru import logger
 from erniebot_agent.extensions.langchain.llms import ErnieBot
 from langchain_community.llms  import QianfanLLMEndpoint
-
+from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
+from langchain_community.embeddings.sentence_transformer import (
+    SentenceTransformerEmbeddings, 
+)
+from langchain_chroma import Chroma
+from langchain_community.embeddings import QianfanEmbeddingsEndpoint
 
 class LLM:
     def __init__(self, origin=""):
@@ -16,15 +21,23 @@ class LLM:
         os.environ["EB_AGENT_ACCESS_TOKEN"] =  myKeys.EB_AGENT_ACCESS_TOKEN
         os.environ["QIANFAN_AK"] = myKeys.QIANFAN_AK
         os.environ["QIANFAN_SK"] = myKeys.QIANFAN_SK
-        # os.environ["LANGCHAIN_TRACING_V2"]="true"
-        # os.environ["LANGCHAIN_API_KEY"]="ls__c0012d47edfc4b3a8c19c40242a3521e"
+        os.environ["LANGCHAIN_TRACING_V2"]="true"
+        os.environ["LANGCHAIN_API_KEY"]="ls__c0012d47edfc4b3a8c19c40242a3521e"
+
+        ## 初始化rag
+        self.db_path = "./chroma_db"
+        if not os.path.exists(self.db_path):
+            self.chroma = self.init_rag_from_md("data/data_merge.md")
+        else:
+            self.chroma = self.init_rag_from_db()
+
         if origin == "qianfan":
             logger.info("use qianfan llm")
             self.llm = QianfanLLMEndpoint(model="ERNIE-4.0-8K-Preview-0518")
         else:
-            self.llm = ErnieBot(aistudio_access_token=myKeys.EB_AGENT_ACCESS_TOKEN, model="ernie-4.0")
+            self.llm = ErnieBot(aistudio_access_token=myKeys.EB_AGENT_ACCESS_TOKEN, model="ernie-3.5")
         
-        guider_prompt = "你是智途问答大冒险中的游戏助手，叫做小桨，你负责陪伴玩家在太空进行探险，用比较通俗易懂的方式解答玩家遇到的问题。当前游戏事件如下：{event_content}\n"
+        guider_prompt = "你是智途问答大冒险中的游戏助手，叫做小桨，你负责陪伴玩家在太空进行探险，用比较通俗易懂的方式解答玩家遇到的问题。当前游戏事件如下：{event_content}\n 参考资料：{rag_content}\n"
 
         self.guider_prompt = ChatPromptTemplate.from_messages(
             [
@@ -64,12 +77,31 @@ class LLM:
                             "玩家对话：```{messages}```\n"),
             ]
         )
-    def chat_with_guider(self, input, event_content):
+
+        ## rag prompt
+        self.rag_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "你需要以下参考资料，回答问题。\n" \
+                            "参考资料：{content}\n" \
+                            "问题：{question}\n"),
+            ]
+        )
+
+        ## 重新组织问题
+        self.reorganize_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", "你需要根据以下历史对话和游戏事件，重新组织用户输入的问题，补充或替换问题中不清晰的指代主体，以便根据你输出的问题进行搜索。\n" \
+                            "对话：```{messages}```\n"
+                            "游戏事件：{event_content}\n" \
+                            "问题：{question}\n"),
+            ]
+        )
+    def chat_with_guider(self, input, event_content, rag_content = ""):
         retries = 3
         for _ in range(retries):
             try:
                 chain  = self.guider_prompt | self.llm | StrOutputParser()
-                response = chain.stream({"messages": input, "event_content": event_content})
+                response = chain.stream({"messages": input, "event_content": event_content, "rag_content": rag_content})
                 return response
             except Exception as e:
                 logger.error(e)
@@ -107,6 +139,70 @@ class LLM:
                 chain  = self.question_prompt | self.llm | StrOutputParser()
                 response = chain.invoke({"messages": input, "event_content": event_content})
                 return response
+            except Exception as e:
+                logger.error(e)
+                time.sleep(1)  # Retry after 1 second
+        raise Exception("Failed after {} retries".format(retries))
+    def init_rag_from_md(self, path):
+        # 读取文件
+        with open(path, "r", encoding="utf-8") as f:
+            markdown_document = f.read()
+
+        headers_to_split_on = [
+            ("#", "Header 1"),
+        ]
+
+        # MD splits
+        markdown_splitter = MarkdownHeaderTextSplitter(
+            headers_to_split_on=headers_to_split_on, strip_headers=True
+        )
+        md_header_splits = markdown_splitter.split_text(markdown_document)
+        for split in md_header_splits:
+            logger.info("split: {}", split.page_content)
+
+        chunk_size = 250
+        chunk_overlap = 30
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size, chunk_overlap=chunk_overlap
+        )
+
+        # Split
+        splits = text_splitter.split_documents(md_header_splits)
+
+        for idx in range(len(splits)):
+            split = splits[idx]
+            header = split.metadata["Header 1"]
+            content = split.page_content
+            splits[idx].page_content = f"[{header}]{content}"
+            logger.info("split after text splitter: {}", splits[idx])
+        logger.info(f"Split {len(splits)} chunks")
+
+        # save to disk
+        return Chroma.from_documents(splits, embedding=QianfanEmbeddingsEndpoint(), persist_directory=self.db_path)
+
+    def init_rag_from_db(self):
+        return Chroma(persist_directory=self.db_path, embedding_function=QianfanEmbeddingsEndpoint())
+    
+    def get_retriever_docs(self, input):
+        retriever = self.chroma.as_retriever(search_type="similarity", search_kwargs={"k": 6})
+        docs = retriever.invoke(input=input)
+        return "\n\n".join(doc.page_content for doc in docs)
+
+    def rag(self, input):
+        try:
+            content = self.get_retriever_docs(input)
+            return content 
+        except Exception as e:
+            logger.error(e)
+            return ""
+    
+    def chat_with_reorganize(self, input, event_content):
+        retries = 3
+        for _ in range(retries):
+            try:
+                chain  = self.reorganize_prompt | self.llm | StrOutputParser()
+                response = chain.invoke({"question": input[-1], "messages": input[:-1], "event_content": event_content})
+                return response 
             except Exception as e:
                 logger.error(e)
                 time.sleep(1)  # Retry after 1 second

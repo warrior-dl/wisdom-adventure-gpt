@@ -33,8 +33,8 @@ class Voice:
                 frames = f.getnframes()
                 rate = f.getframerate()
                 duration = frames / float(rate)
-            # 加0.5秒停顿
-            return wav_path, duration + 0.5
+            # 加0.2秒停顿
+            return wav_path, duration + 0.2
         except Exception as e:
             logger.error("tts error: {}", e)
             return None, None
