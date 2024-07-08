@@ -3,6 +3,7 @@ import time
 import os
 import asyncio
 import myKeys
+from functools import wraps
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 from loguru import logger
@@ -14,6 +15,43 @@ from langchain_community.embeddings.sentence_transformer import (
 )
 from langchain_chroma import Chroma
 from langchain_community.embeddings import QianfanEmbeddingsEndpoint
+
+def retry(retries: int = 3, delay: float = 1):
+    """
+    函数执行失败时，重试
+
+    :param retries: 最大重试的次数
+    :param delay: 每次重试的间隔时间，单位 秒
+    :return:
+    """
+
+    # 校验重试的参数，参数值不正确时使用默认参数
+    if retries < 1 or delay <= 0:
+        retries = 3
+        delay = 1
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # 第一次正常执行不算重试次数，所以retries+1
+            for i in range(retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    # 检查重试次数
+                    if i == retries:
+                        logger.warning(f"Error: {repr(e)}")
+                        logger.warning(f'"{func.__name__}()" 执行失败，已重试{retries}次')
+                        break
+                    else:
+                        logger.warning(
+                            f"Error: {repr(e)}，{delay}秒后第[{i+1}/{retries}]次重试..."
+                        )
+                        time.sleep(delay)
+
+        return wrapper
+
+    return decorator
 
 class LLM:
     def __init__(self, origin=""):
@@ -96,53 +134,36 @@ class LLM:
                             "问题：{question}\n"),
             ]
         )
+    @retry(retries=2, delay=1)
     def chat_with_guider(self, input, event_content, rag_content = ""):
-        retries = 3
-        for _ in range(retries):
-            try:
-                chain  = self.guider_prompt | self.llm | StrOutputParser()
-                response = chain.stream({"messages": input, "event_content": event_content, "rag_content": rag_content})
-                return response
-            except Exception as e:
-                logger.error(e)
-                time.sleep(1)  # Retry after 1 second
-        raise Exception("Failed after {} retries".format(retries))
+        chain  = self.guider_prompt | self.llm | StrOutputParser()
+        response = chain.stream({"messages": input, "event_content": event_content, "rag_content": rag_content})
+        return response
 
+    @retry(retries=2, delay=1)
     def chat_with_npc(self, input, event_content, background, purpose, knowledge):
-        retries = 3
-        for _ in range(retries):
-            try:
-                chain  = self.npc_prompt | self.llm | StrOutputParser()
-                response = chain.stream({"messages": input, "event_content": event_content, "background": background, "purpose": purpose, "knowledge": knowledge})
-                return response
-            except Exception as e:
-                logger.error(e)
-                time.sleep(1)  # Retry after 1 second
-        raise Exception("Failed after {} retries".format(retries))
+        chain  = self.npc_prompt | self.llm | StrOutputParser()
+        response = chain.stream({"messages": input, "event_content": event_content, "background": background, "purpose": purpose, "knowledge": knowledge})
+        return response
 
+    @retry(retries=2, delay=1)
     def chat_with_referee(self, input, event_content):
-        retries = 3
-        for _ in range(retries):
-            try:
-                chain  = self.referee_prompt | self.llm | StrOutputParser()
-                response = chain.invoke({"messages": input, "event_content": event_content})
-                return response
-            except Exception as e:
-                logger.error(e)
-                time.sleep(1)  # Retry after 1 second
-        raise Exception("Failed after {} retries".format(retries))
+        chain  = self.referee_prompt | self.llm | StrOutputParser()
+        response = chain.invoke({"messages": input, "event_content": event_content})
+        return response
 
+    @retry(retries=2, delay=1)
     def chat_with_question(self, input, event_content):
-        retries = 3
-        for _ in range(retries):
-            try:
-                chain  = self.question_prompt | self.llm | StrOutputParser()
-                response = chain.invoke({"messages": input, "event_content": event_content})
-                return response
-            except Exception as e:
-                logger.error(e)
-                time.sleep(1)  # Retry after 1 second
-        raise Exception("Failed after {} retries".format(retries))
+        chain  = self.question_prompt | self.llm | StrOutputParser()
+        response = chain.invoke({"messages": input, "event_content": event_content})
+        return response
+    
+    @retry(retries=2, delay=1)
+    def chat_with_reorganize(self, input, event_content):
+        chain  = self.reorganize_prompt | self.llm | StrOutputParser()
+        response = chain.invoke({"question": input[-1], "messages": input[:-1], "event_content": event_content})
+        return response 
+    
     def init_rag_from_md(self, path):
         # 读取文件
         with open(path, "r", encoding="utf-8") as f:
@@ -195,15 +216,3 @@ class LLM:
         except Exception as e:
             logger.error(e)
             return ""
-    
-    def chat_with_reorganize(self, input, event_content):
-        retries = 3
-        for _ in range(retries):
-            try:
-                chain  = self.reorganize_prompt | self.llm | StrOutputParser()
-                response = chain.invoke({"question": input[-1], "messages": input[:-1], "event_content": event_content})
-                return response 
-            except Exception as e:
-                logger.error(e)
-                time.sleep(1)  # Retry after 1 second
-        raise Exception("Failed after {} retries".format(retries))
